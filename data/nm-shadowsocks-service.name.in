@@ -1,0 +1,13 @@
+[VPN Connection]
+name=shadowsocks
+service=org.freedesktop.NetworkManager.shadowsocks
+program=@LIBEXECDIR@/nm-shadowsocks-service
+supports-multiple-connections=false
+supports-safe-private-file-access=true
+
+[libnm]
+plugin=@EDITOR@
+
+[GNOME]
+auth-dialog=@LIBEXECDIR@/nm-shadowsocks-auth-dialog
+supports-external-ui-mode=true

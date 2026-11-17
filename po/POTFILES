@@ -1,0 +1,11 @@
+src/regional.c
+src/cli.c
+src/editor.c
+src/editor-plugin.c
+src/profile.c
+src/plugin.c
+src/routes.c
+src/runtime.c
+src/service.c
+tools/update-routes.py
+src/auth-dialog.c

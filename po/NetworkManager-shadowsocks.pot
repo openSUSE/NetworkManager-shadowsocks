@@ -1,0 +1,729 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the NetworkManager-shadowsocks package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: NetworkManager-shadowsocks\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-14 15:59+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/regional.c:5
+#, c-format
+msgid "Invalid APNIC data: %s"
+msgstr ""
+
+#: src/regional.c:20
+msgid "Default dataset is missing IPv4 or IPv6 prefixes"
+msgstr ""
+
+#: src/regional.c:24
+msgid ""
+"Default China dataset not found; install the data files or run nm-"
+"shadowsocks-update-routes"
+msgstr ""
+
+#: src/cli.c:10
+#, c-format
+msgid ""
+"Saved: %s\n"
+"Activate: nmcli connection up uuid %s\n"
+msgstr ""
+
+#: src/cli.c:20
+#, c-format
+msgid "Updated: %s\n"
+msgstr ""
+
+#: src/cli.c:32
+msgid "No Shadowsocks connection found with this UUID"
+msgstr ""
+
+#: src/cli.c:57
+msgid "TCP node JSON"
+msgstr ""
+
+#: src/cli.c:58
+msgid "UDP node JSON (defaults to the TCP node)"
+msgstr ""
+
+#: src/cli.c:59
+msgid "TCP node index (starting at 0)"
+msgstr ""
+
+#: src/cli.c:60
+msgid "UDP node index (starting at 0)"
+msgstr ""
+
+#: src/cli.c:61
+msgid "Connection name"
+msgstr ""
+
+#: src/cli.c:62
+msgid "Proxy mode: global / lan / china"
+msgstr ""
+
+#: src/cli.c:63
+msgid "IP mode: ipv4 / ipv6 / dual"
+msgstr ""
+
+#: src/cli.c:64
+msgid "Comma-separated DNS IP addresses"
+msgstr ""
+
+#: src/cli.c:65
+msgid "Regional CIDR text file"
+msgstr ""
+
+#: src/cli.c:66
+msgid "Additional bypass CIDR text file"
+msgstr ""
+
+#: src/cli.c:67
+msgid "Only export configuration (includes passwords, mode 0600)"
+msgstr ""
+
+#: src/cli.c:68
+msgid "Update an existing connection"
+msgstr ""
+
+#: src/cli.c:69
+msgid "Show version"
+msgstr ""
+
+#: src/cli.c:93
+msgid "Specify --tcp and non-negative node indexes"
+msgstr ""
+
+#: src/cli.c:121
+#, c-format
+msgid "Exported (includes passwords): %s\n"
+msgstr ""
+
+#: src/cli.c:125
+msgid "Specify one configuration file"
+msgstr ""
+
+#: src/cli.c:128
+#, c-format
+msgid "Configuration is valid: %s\n"
+msgstr ""
+
+#: src/cli.c:135
+msgid "Unknown command"
+msgstr ""
+
+#: src/cli.c:140 tools/update-routes.py:311
+#, c-format, python-format
+msgid "Error: %s\n"
+msgstr ""
+
+#: src/cli.c:140
+msgid "Operation failed"
+msgstr ""
+
+#: src/editor.c:62
+#, c-format
+msgid "Regional prefixes: IPv4 %u / IPv6 %u - Import custom list..."
+msgstr ""
+
+#: src/editor.c:103
+msgid "Node imported. Save to apply changes."
+msgstr ""
+
+#: src/editor.c:121
+msgid "Select a CIDR text file (one prefix per line)"
+msgstr ""
+
+#: src/editor.c:122
+msgid "Import node JSON (using the node index below)"
+msgstr ""
+
+#: src/editor.c:124
+msgid "Open"
+msgstr ""
+
+#: src/editor.c:124
+msgid "Cancel"
+msgstr ""
+
+#: src/editor.c:242
+msgid "Shadowsocks - Transparent proxy"
+msgstr ""
+
+#: src/editor.c:258
+msgid "Server"
+msgstr ""
+
+#: src/editor.c:258
+msgid "Port"
+msgstr ""
+
+#: src/editor.c:259
+msgid "Cipher"
+msgstr ""
+
+#: src/editor.c:259
+msgid "Password / Key"
+msgstr ""
+
+#: src/editor.c:260
+msgid "Import from JSON..."
+msgstr ""
+
+#: src/editor.c:265
+msgid "Import node index"
+msgstr ""
+
+#: src/editor.c:270
+msgid "TCP only"
+msgstr ""
+
+#: src/editor.c:270
+msgid "UDP only"
+msgstr ""
+
+#: src/editor.c:270
+msgid "TCP and UDP"
+msgstr ""
+
+#: src/editor.c:276
+msgid "None, obfs-local, v2ray-plugin, ..."
+msgstr ""
+
+#: src/editor.c:278
+msgid "JSON array of command arguments; no shell is used"
+msgstr ""
+
+#: src/editor.c:279
+msgid ""
+"Most SIP003 plugins support TCP only. Select UDP only or TCP and UDP only if "
+"your plugin supports it."
+msgstr ""
+
+#: src/editor.c:280
+msgid "Obfuscation plugin (SIP003)"
+msgstr ""
+
+#: src/editor.c:281
+msgid "Plugin options"
+msgstr ""
+
+#: src/editor.c:282
+msgid "Plugin arguments (JSON)"
+msgstr ""
+
+#: src/editor.c:283
+msgid "Plugin transport"
+msgstr ""
+
+#: src/editor.c:284
+msgid "TCP node"
+msgstr ""
+
+#: src/editor.c:284
+msgid "UDP node"
+msgstr ""
+
+#: src/editor.c:295
+msgid "Use the TCP node for UDP (uncheck to configure separately)"
+msgstr ""
+
+#: src/editor.c:318
+msgid "Global proxy"
+msgstr ""
+
+#: src/editor.c:318
+msgid "Bypass LAN"
+msgstr ""
+
+#: src/editor.c:318
+msgid "Bypass regional IPs (defaults to mainland China IPs) and LAN"
+msgstr ""
+
+#: src/editor.c:320
+msgid "IPv4 only"
+msgstr ""
+
+#: src/editor.c:320
+msgid "IPv6 only"
+msgstr ""
+
+#: src/editor.c:326
+msgid "Comma-separated CIDRs (optional)"
+msgstr ""
+
+#: src/editor.c:327
+msgid ""
+"Comma-separated DNS IPs matching the enabled address families; DNS always "
+"uses the proxy."
+msgstr ""
+
+#: src/editor.c:328
+msgid "Proxy mode"
+msgstr ""
+
+#: src/editor.c:328
+msgid "Address families"
+msgstr ""
+
+#: src/editor.c:329
+msgid "Additional bypass"
+msgstr ""
+
+#: src/editor.c:340
+msgid "Use latest default prefixes (updated dataset / bundled snapshot)"
+msgstr ""
+
+#: src/editor.c:343
+msgid ""
+"UDP and TCP DNS queries use their respective nodes. Only TCP/UDP is "
+"proxied.\n"
+"Single-stack mode blocks non-bypassed TCP/UDP traffic of the other address "
+"family."
+msgstr ""
+
+#: src/editor-plugin.c:14
+msgid "Transparent proxy using shadowsocks-rust with separate TCP/UDP nodes"
+msgstr ""
+
+#: src/editor-plugin.c:41
+msgid "Cannot locate the Shadowsocks editor module"
+msgstr ""
+
+#: src/editor-plugin.c:48 src/editor-plugin.c:53
+#, c-format
+msgid "Cannot load editor module: %s"
+msgstr ""
+
+#: src/profile.c:42
+msgid "Configuration must not exceed 4 MiB"
+msgstr ""
+
+#: src/profile.c:49
+msgid "Configuration must be a JSON object"
+msgstr ""
+
+#: src/profile.c:63
+msgid "File must not exceed 4 MiB"
+msgstr ""
+
+#: src/profile.c:70 tools/update-routes.py:178
+msgid "File contains NUL bytes"
+msgstr ""
+
+#: src/profile.c:97
+msgid "Missing TCP or UDP node"
+msgstr ""
+
+#: src/profile.c:104
+msgid "Server address must contain 1-253 characters"
+msgstr ""
+
+#: src/profile.c:109
+msgid "Server must be an IP address or an ASCII DNS hostname"
+msgstr ""
+
+#: src/profile.c:110
+msgid "Hostname must start with a letter or digit"
+msgstr ""
+
+#: src/profile.c:115
+msgid "Port must be an integer between 1 and 65535"
+msgstr ""
+
+#: src/profile.c:116
+msgid "Unsupported cipher; use an AEAD node"
+msgstr ""
+
+#: src/profile.c:117
+msgid "Node password must not be empty or exceed 4096 bytes"
+msgstr ""
+
+#: src/profile.c:122
+msgid "Plugin name, options and mode must be strings"
+msgstr ""
+
+#: src/profile.c:126
+msgid "Plugin name or options are too long"
+msgstr ""
+
+#: src/profile.c:129 src/profile.c:131
+msgid ""
+"Plugin must be an executable name or an absolute path, without arguments"
+msgstr ""
+
+#: src/profile.c:134
+msgid "Invalid plugin mode"
+msgstr ""
+
+#: src/profile.c:138
+msgid "Plugin arguments must be a JSON array of at most 64 strings"
+msgstr ""
+
+#: src/profile.c:144
+msgid "Plugin arguments must be strings of at most 4096 bytes"
+msgstr ""
+
+#: src/profile.c:149
+msgid "Specify a plugin executable before setting plugin options or arguments"
+msgstr ""
+
+#: src/profile.c:162
+msgid "Invalid CIDR list or more than 100000 entries"
+msgstr ""
+
+#: src/profile.c:165
+msgid "CIDR entries must be strings"
+msgstr ""
+
+#: src/profile.c:167
+msgid "CIDR entries must include a prefix length"
+msgstr ""
+
+#: src/profile.c:170 tools/update-routes.py:134
+msgid "Bypass ranges must not include a /0 default route"
+msgstr ""
+
+#: src/profile.c:181
+msgid "Connection name must contain 1-128 bytes"
+msgstr ""
+
+#: src/profile.c:185
+msgid "Invalid proxy mode or IP mode"
+msgstr ""
+
+#: src/profile.c:188
+msgid "Specify 1-8 DNS IP addresses"
+msgstr ""
+
+#: src/profile.c:191
+msgid "DNS addresses must be IP address strings"
+msgstr ""
+
+#: src/profile.c:195
+msgid "DNS must be a unicast IP reachable through the proxy, not a local stub"
+msgstr ""
+
+#: src/profile.c:199
+msgid "Upstream DNS must not use the internal TUN addresses"
+msgstr ""
+
+#: src/profile.c:201
+msgid "DNS address family does not match the IP mode"
+msgstr ""
+
+#: src/profile.c:212
+msgid "Regional CIDRs must cover each enabled address family"
+msgstr ""
+
+#: src/profile.c:262
+msgid "Node index is out of range; indexes start at 0"
+msgstr ""
+
+#: src/profile.c:268
+msgid "Single-node files only support index 0"
+msgstr ""
+
+#: src/profile.c:301
+#, c-format
+msgid "Cannot create configuration file: %s"
+msgstr ""
+
+#: src/profile.c:306
+#, c-format
+msgid "Cannot write configuration file"
+msgstr ""
+
+#: src/profile.c:309
+msgid "Cannot close configuration file"
+msgstr ""
+
+#: src/profile.c:357
+msgid "Not a Shadowsocks VPN connection"
+msgstr ""
+
+#: src/profile.c:361
+msgid "Missing configuration"
+msgstr ""
+
+#: src/plugin.c:42
+msgid ""
+"Plugin is missing or untrusted; install a supported system plugin or ask an "
+"administrator to register it in /usr/libexec/NetworkManager/shadowsocks/"
+"plugins"
+msgstr ""
+
+#: src/routes.c:112
+#, c-format
+msgid "IPv%u route batch failed: %s"
+msgstr ""
+
+#: src/routes.c:126
+#, c-format
+msgid "iproute2 failed: %s"
+msgstr ""
+
+#: src/routes.c:141
+msgid "iproute2 did not return a JSON array"
+msgstr ""
+
+#: src/routes.c:156
+msgid ""
+"Routing tables 51820/51821 or rule priorities 10500/10501/10502/10503/10510/10511 are in "
+"use"
+msgstr ""
+
+#: src/runtime.c:46
+msgid "The VPN service must run as root"
+msgstr ""
+
+#: src/runtime.c:52
+msgid "Another Shadowsocks instance is running or the lock file is invalid"
+msgstr ""
+
+#: src/runtime.c:56
+msgid "The nmss-tun interface is already in use"
+msgstr ""
+
+#: src/runtime.c:60
+#, c-format
+msgid "Cannot create runtime directory: %s"
+msgstr ""
+
+#: src/runtime.c:91
+msgid "A plugin server must not also be an upstream DNS server"
+msgstr ""
+
+#: src/runtime.c:111
+msgid ""
+"TUN startup timed out: check sslocal local-tun support, cipher and node key"
+msgstr ""
+
+#: src/runtime.c:121
+msgid "Cannot configure TUN rp_filter"
+msgstr ""
+
+#: src/runtime.c:150
+#, c-format
+msgid "Route rollback failed: %s"
+msgstr ""
+
+#: src/runtime.c:156
+#, c-format
+msgid "Routing table cleanup failed: %s"
+msgstr ""
+
+#: src/service.c:36
+msgid "Shadowsocks backend exited"
+msgstr ""
+
+#: src/service.c:74
+#, c-format
+msgid "Startup failed: %s"
+msgstr ""
+
+#: src/service.c:74
+msgid "Connection cancelled"
+msgstr ""
+
+#: src/service.c:87
+msgid "A connection is already running or being cleaned up"
+msgstr ""
+
+#: src/service.c:133
+msgid "D-Bus service name"
+msgstr ""
+
+#: src/service.c:134
+msgid "Keep service after disconnect"
+msgstr ""
+
+#: src/service.c:135
+msgid "Initialize D-Bus only, then exit"
+msgstr ""
+
+#: src/service.c:146
+#, c-format
+msgid "D-Bus initialization failed: %s\n"
+msgstr ""
+
+#: tools/update-routes.py:55
+#, python-format
+msgid "Invalid RIR data: %s"
+msgstr ""
+
+#: tools/update-routes.py:64
+msgid "Regions must be two-letter country/region codes"
+msgstr ""
+
+#: tools/update-routes.py:67
+msgid "Specify at least one region"
+msgstr ""
+
+#: tools/update-routes.py:73 tools/update-routes.py:175
+msgid "Empty file or more than 32 MiB"
+msgstr ""
+
+#: tools/update-routes.py:86 tools/update-routes.py:93
+msgid "Invalid version date, record count or duplicate version header"
+msgstr ""
+
+#: tools/update-routes.py:96
+msgid "Registry header does not match the selected source"
+msgstr ""
+
+#: tools/update-routes.py:104
+msgid "Selected region record has missing fields"
+msgstr ""
+
+#: tools/update-routes.py:108
+msgid "Invalid address count or prefix length"
+msgstr ""
+
+#: tools/update-routes.py:114 tools/update-routes.py:116
+msgid "Invalid address family"
+msgstr ""
+
+#: tools/update-routes.py:119
+msgid "IPv4 range overflow"
+msgstr ""
+
+#: tools/update-routes.py:124
+msgid "IPv6 prefix length must be between 1 and 128"
+msgstr ""
+
+#: tools/update-routes.py:128
+msgid "IPv6 prefix is not aligned"
+msgstr ""
+
+#: tools/update-routes.py:137 tools/update-routes.py:154
+#: tools/update-routes.py:300
+msgid "Too many network prefixes"
+msgstr ""
+
+#: tools/update-routes.py:139
+msgid "Missing RIR header or mismatched record count; file may be incomplete"
+msgstr ""
+
+#: tools/update-routes.py:147
+#, python-format
+msgid "No records for the requested address families in regions: %s"
+msgstr ""
+
+#: tools/update-routes.py:161
+msgid "Refusing a redirect to a non-HTTPS URL"
+msgstr ""
+
+#: tools/update-routes.py:169
+msgid "Download timed out"
+msgstr ""
+
+#: tools/update-routes.py:190
+#, python-format
+msgid "Download failed; keeping the old dataset: %s"
+msgstr ""
+
+#: tools/update-routes.py:254
+msgid "Download and update regional IPv4/IPv6 prefixes"
+msgstr ""
+
+#: tools/update-routes.py:256
+msgid "Convert local RIR delegated files (offline; repeatable)"
+msgstr ""
+
+#: tools/update-routes.py:258
+msgid "Country/region codes, comma-separated or repeatable (default: CN)"
+msgstr ""
+
+#: tools/update-routes.py:260
+msgid "RIR source (default: apnic); all merges the five registries"
+msgstr ""
+
+#: tools/update-routes.py:262
+msgid "Address families to export (default: dual)"
+msgstr ""
+
+#: tools/update-routes.py:264
+msgid ""
+"Output directory (default: user data directory, or system state directory "
+"for root)"
+msgstr ""
+
+#: tools/update-routes.py:270 tools/update-routes.py:302
+msgid ""
+"Custom regions or sources require --output to preserve the default China "
+"dataset"
+msgstr ""
+
+#: tools/update-routes.py:287
+#, python-format
+msgid "Duplicate registry input: %s"
+msgstr ""
+
+#: tools/update-routes.py:305
+#, python-format
+msgid ""
+"Updated regions %(regions)s: %(path)s\n"
+"Total prefixes: %(count)d\n"
+msgstr ""
+
+#: tools/update-routes.py:308
+msgid ""
+"For existing connections, select \"Use latest default prefixes\" in the "
+"editor, save and reconnect."
+msgstr ""
+
+msgid "Loading saved passwords... You can also enter them manually."
+msgstr ""
+
+#, c-format
+msgid "Cannot load saved passwords: %s. Retry or enter the passwords to enable Apply."
+msgstr ""
+
+msgid "Saved passwords were not returned. Retry or enter the passwords to enable Apply."
+msgstr ""
+
+msgid "v2ray-plugin accepts TCP only. For a native Shadowsocks UDP node, clear its plugin, options and arguments."
+msgstr ""
+
+#: src/editor.c
+msgid "To change passwords while saved passwords are unavailable, enter passwords for both nodes."
+msgstr ""
+
+#: src/editor.c
+msgid "Cannot load saved passwords: %s. Leave passwords unchanged to keep the saved values."
+msgstr ""
+
+#: src/editor.c
+msgid "Saved passwords were not returned. Leave passwords unchanged to keep the saved values."
+msgstr ""
+
+#: src/editor.c
+msgid "Load or enter passwords before changing whether the UDP node shares the TCP node."
+msgstr ""
+
+#: src/editor.c
+msgid "Leave unchanged to keep the saved password"
+msgstr ""
+
+#: src/auth-dialog.c
+msgid "Shadowsocks authentication"
+msgstr ""
+
+#: src/auth-dialog.c
+msgid "TCP node password"
+msgstr ""
+
+#: src/auth-dialog.c
+msgid "UDP node password"
+msgstr ""

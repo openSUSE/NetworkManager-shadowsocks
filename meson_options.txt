@@ -1,0 +1,4 @@
+option('sslocal_binary', type: 'string', value: '/usr/bin/sslocal', description: 'Absolute shadowsocks-rust sslocal path')
+option('ip_binary', type: 'string', value: '/usr/sbin/ip', description: 'Absolute iproute2 ip path')
+option('vpn_service_dir', type: 'string', value: '', description: 'NetworkManager VPN metadata directory (auto from libnm)')
+option('network_tests', type: 'boolean', value: false, description: 'Run route integration tests in an unprivileged private network namespace')

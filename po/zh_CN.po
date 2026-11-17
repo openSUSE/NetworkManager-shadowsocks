@@ -1,0 +1,736 @@
+# Simplified Chinese translations for NetworkManager-shadowsocks.
+msgid ""
+msgstr ""
+"Project-Id-Version: NetworkManager-shadowsocks 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-14 15:59+0800\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: NetworkManager-shadowsocks contributors\n"
+"Language-Team: Simplified Chinese\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/regional.c:5
+#, c-format
+msgid "Invalid APNIC data: %s"
+msgstr "APNIC 数据无效：%s"
+
+#: src/regional.c:20
+msgid "Default dataset is missing IPv4 or IPv6 prefixes"
+msgstr "默认库缺少 IPv4 或 IPv6"
+
+#: src/regional.c:24
+msgid ""
+"Default China dataset not found; install the data files or run nm-"
+"shadowsocks-update-routes"
+msgstr ""
+"找不到默认大陆网段库，请安装数据文件或运行 nm-shadowsocks-update-routes"
+
+#: src/cli.c:10
+#, c-format
+msgid ""
+"Saved: %s\n"
+"Activate: nmcli connection up uuid %s\n"
+msgstr ""
+"已保存：%s\n"
+"启用：nmcli connection up uuid %s\n"
+
+#: src/cli.c:20
+#, c-format
+msgid "Updated: %s\n"
+msgstr "已更新：%s\n"
+
+#: src/cli.c:32
+msgid "No Shadowsocks connection found with this UUID"
+msgstr "找不到此 UUID 的 Shadowsocks 连接"
+
+#: src/cli.c:57
+msgid "TCP node JSON"
+msgstr "TCP 节点 JSON"
+
+#: src/cli.c:58
+msgid "UDP node JSON (defaults to the TCP node)"
+msgstr "UDP 节点 JSON（缺省共用 TCP）"
+
+#: src/cli.c:59
+msgid "TCP node index (starting at 0)"
+msgstr "TCP 节点索引（从 0 开始）"
+
+#: src/cli.c:60
+msgid "UDP node index (starting at 0)"
+msgstr "UDP 节点索引（从 0 开始）"
+
+#: src/cli.c:61
+msgid "Connection name"
+msgstr "连接名称"
+
+#: src/cli.c:62
+msgid "Proxy mode: global / lan / china"
+msgstr "代理模式：global / lan / china"
+
+#: src/cli.c:63
+msgid "IP mode: ipv4 / ipv6 / dual"
+msgstr "IP 模式：ipv4 / ipv6 / dual"
+
+#: src/cli.c:64
+msgid "Comma-separated DNS IP addresses"
+msgstr "DNS IP，以逗号分隔"
+
+#: src/cli.c:65
+msgid "Regional CIDR text file"
+msgstr "区域 CIDR 文本文件"
+
+#: src/cli.c:66
+msgid "Additional bypass CIDR text file"
+msgstr "额外直连 CIDR 文本文件"
+
+#: src/cli.c:67
+msgid "Only export configuration (includes passwords, mode 0600)"
+msgstr "仅输出配置文件（含密码，0600）"
+
+#: src/cli.c:68
+msgid "Update an existing connection"
+msgstr "更新现有连接"
+
+#: src/cli.c:69
+msgid "Show version"
+msgstr "显示版本"
+
+#: src/cli.c:93
+msgid "Specify --tcp and non-negative node indexes"
+msgstr "需要 --tcp 文件及非负索引"
+
+#: src/cli.c:121
+#, c-format
+msgid "Exported (includes passwords): %s\n"
+msgstr "已导出（含密码）：%s\n"
+
+#: src/cli.c:125
+msgid "Specify one configuration file"
+msgstr "请指定一个配置文件"
+
+#: src/cli.c:128
+#, c-format
+msgid "Configuration is valid: %s\n"
+msgstr "配置有效：%s\n"
+
+#: src/cli.c:135
+msgid "Unknown command"
+msgstr "未知命令"
+
+#: src/cli.c:140 tools/update-routes.py:311
+#, c-format, python-format
+msgid "Error: %s\n"
+msgstr "错误：%s\n"
+
+#: src/cli.c:140
+msgid "Operation failed"
+msgstr "操作失败"
+
+#: src/editor.c:62
+#, c-format
+msgid "Regional prefixes: IPv4 %u / IPv6 %u - Import custom list..."
+msgstr "区域网段：IPv4 %u / IPv6 %u · 自定义导入…"
+
+#: src/editor.c:103
+msgid "Node imported. Save to apply changes."
+msgstr "节点已导入，保存后生效。"
+
+#: src/editor.c:121
+msgid "Select a CIDR text file (one prefix per line)"
+msgstr "选择 CIDR 文本文件（每行一个网段）"
+
+#: src/editor.c:122
+msgid "Import node JSON (using the node index below)"
+msgstr "导入节点 JSON（使用下方节点索引）"
+
+#: src/editor.c:124
+msgid "Open"
+msgstr "打开"
+
+#: src/editor.c:124
+msgid "Cancel"
+msgstr "取消"
+
+#: src/editor.c:242
+msgid "Shadowsocks - Transparent proxy"
+msgstr "Shadowsocks · 透明代理"
+
+#: src/editor.c:258
+msgid "Server"
+msgstr "服务器"
+
+#: src/editor.c:258
+msgid "Port"
+msgstr "端口"
+
+#: src/editor.c:259
+msgid "Cipher"
+msgstr "加密方式"
+
+#: src/editor.c:259
+msgid "Password / Key"
+msgstr "密码 / 密钥"
+
+#: src/editor.c:260
+msgid "Import from JSON..."
+msgstr "从 JSON 文件导入…"
+
+#: src/editor.c:265
+msgid "Import node index"
+msgstr "导入节点索引"
+
+#: src/editor.c:270
+msgid "TCP only"
+msgstr "仅 TCP"
+
+#: src/editor.c:270
+msgid "UDP only"
+msgstr "仅 UDP"
+
+#: src/editor.c:270
+msgid "TCP and UDP"
+msgstr "TCP 和 UDP"
+
+#: src/editor.c:276
+msgid "None, obfs-local, v2ray-plugin, ..."
+msgstr "留空禁用，或填写 obfs-local、v2ray-plugin 等"
+
+#: src/editor.c:278
+msgid "JSON array of command arguments; no shell is used"
+msgstr "命令参数的 JSON 数组；不通过 shell 执行"
+
+#: src/editor.c:279
+msgid ""
+"Most SIP003 plugins support TCP only. Select UDP only or TCP and UDP only if "
+"your plugin supports it."
+msgstr ""
+"多数 SIP003 插件仅支持 TCP。仅当插件支持 UDP 时，才选择“仅 UDP”或“TCP 和 "
+"UDP”。"
+
+#: src/editor.c:280
+msgid "Obfuscation plugin (SIP003)"
+msgstr "混淆插件（SIP003）"
+
+#: src/editor.c:281
+msgid "Plugin options"
+msgstr "插件选项"
+
+#: src/editor.c:282
+msgid "Plugin arguments (JSON)"
+msgstr "插件参数（JSON）"
+
+#: src/editor.c:283
+msgid "Plugin transport"
+msgstr "插件传输协议"
+
+#: src/editor.c:284
+msgid "TCP node"
+msgstr "TCP 节点"
+
+#: src/editor.c:284
+msgid "UDP node"
+msgstr "UDP 节点"
+
+#: src/editor.c:295
+msgid "Use the TCP node for UDP (uncheck to configure separately)"
+msgstr "UDP 共用 TCP 节点（取消后可独立配置）"
+
+#: src/editor.c:318
+msgid "Global proxy"
+msgstr "全局代理"
+
+#: src/editor.c:318
+msgid "Bypass LAN"
+msgstr "局域网例外"
+
+#: src/editor.c:318
+msgid "Bypass regional IPs (defaults to mainland China IPs) and LAN"
+msgstr "区域 IP（默认为中国大陆 IP）+ 局域网例外"
+
+#: src/editor.c:320
+msgid "IPv4 only"
+msgstr "仅 IPv4"
+
+#: src/editor.c:320
+msgid "IPv6 only"
+msgstr "仅 IPv6"
+
+#: src/editor.c:326
+msgid "Comma-separated CIDRs (optional)"
+msgstr "以逗号分隔的 CIDR，可留空"
+
+#: src/editor.c:327
+msgid ""
+"Comma-separated DNS IPs matching the enabled address families; DNS always "
+"uses the proxy."
+msgstr "以逗号分隔的 DNS IP，须匹配启用地址族；DNS 始终经代理访问。"
+
+#: src/editor.c:328
+msgid "Proxy mode"
+msgstr "代理模式"
+
+#: src/editor.c:328
+msgid "Address families"
+msgstr "地址族"
+
+#: src/editor.c:329
+msgid "Additional bypass"
+msgstr "额外直连"
+
+#: src/editor.c:340
+msgid "Use latest default prefixes (updated dataset / bundled snapshot)"
+msgstr "使用最新默认网段（已更新库 / 内置快照）"
+
+#: src/editor.c:343
+msgid ""
+"UDP and TCP DNS queries use their respective nodes. Only TCP/UDP is "
+"proxied.\n"
+"Single-stack mode blocks non-bypassed TCP/UDP traffic of the other address "
+"family."
+msgstr ""
+"DNS UDP/TCP 查询分别走对应节点。仅代理 TCP/UDP。\n"
+"单地址族模式会阻止另一地址族的非例外 TCP/UDP 流量。"
+
+#: src/editor-plugin.c:14
+msgid "Transparent proxy using shadowsocks-rust with separate TCP/UDP nodes"
+msgstr "shadowsocks-rust 透明代理，支持 TCP/UDP 独立节点"
+
+#: src/editor-plugin.c:41
+msgid "Cannot locate the Shadowsocks editor module"
+msgstr "无法定位 Shadowsocks 编辑器模块"
+
+#: src/editor-plugin.c:48 src/editor-plugin.c:53
+#, c-format
+msgid "Cannot load editor module: %s"
+msgstr "无法加载编辑器模块：%s"
+
+#: src/profile.c:42
+msgid "Configuration must not exceed 4 MiB"
+msgstr "配置不能超过 4 MiB"
+
+#: src/profile.c:49
+msgid "Configuration must be a JSON object"
+msgstr "配置必须为 JSON 对象"
+
+#: src/profile.c:63
+msgid "File must not exceed 4 MiB"
+msgstr "文件不能超过 4 MiB"
+
+#: src/profile.c:70 tools/update-routes.py:178
+msgid "File contains NUL bytes"
+msgstr "文件包含 NUL 字节"
+
+#: src/profile.c:97
+msgid "Missing TCP or UDP node"
+msgstr "缺少 TCP 或 UDP 节点"
+
+#: src/profile.c:104
+msgid "Server address must contain 1-253 characters"
+msgstr "服务器地址必须为 1–253 字符"
+
+#: src/profile.c:109
+msgid "Server must be an IP address or an ASCII DNS hostname"
+msgstr "服务器应为 IP 或 ASCII DNS 主机名"
+
+#: src/profile.c:110
+msgid "Hostname must start with a letter or digit"
+msgstr "主机名必须以字母或数字开头"
+
+#: src/profile.c:115
+msgid "Port must be an integer between 1 and 65535"
+msgstr "端口必须为 1–65535 的整数"
+
+#: src/profile.c:116
+msgid "Unsupported cipher; use an AEAD node"
+msgstr "不支持的加密方式，请使用 AEAD 节点"
+
+#: src/profile.c:117
+msgid "Node password must not be empty or exceed 4096 bytes"
+msgstr "节点密码不能为空或超过 4096 字节"
+
+#: src/profile.c:122
+msgid "Plugin name, options and mode must be strings"
+msgstr "插件名称、选项和模式必须是字符串"
+
+#: src/profile.c:126
+msgid "Plugin name or options are too long"
+msgstr "插件名称或选项过长"
+
+#: src/profile.c:129 src/profile.c:131
+msgid ""
+"Plugin must be an executable name or an absolute path, without arguments"
+msgstr "插件必须是可执行文件名或绝对路径，不能包含参数"
+
+#: src/profile.c:134
+msgid "Invalid plugin mode"
+msgstr "无效的插件传输模式"
+
+#: src/profile.c:138
+msgid "Plugin arguments must be a JSON array of at most 64 strings"
+msgstr "插件参数必须是最多含 64 个字符串的 JSON 数组"
+
+#: src/profile.c:144
+msgid "Plugin arguments must be strings of at most 4096 bytes"
+msgstr "插件参数必须是长度不超过 4096 字节的字符串"
+
+#: src/profile.c:149
+msgid "Specify a plugin executable before setting plugin options or arguments"
+msgstr "设置插件选项或参数前，请先指定插件可执行文件"
+
+#: src/profile.c:162
+msgid "Invalid CIDR list or more than 100000 entries"
+msgstr "CIDR 列表格式错误或超过 100000 条"
+
+#: src/profile.c:165
+msgid "CIDR entries must be strings"
+msgstr "CIDR 必须为字符串"
+
+#: src/profile.c:167
+msgid "CIDR entries must include a prefix length"
+msgstr "CIDR 必须包含前缀长度"
+
+#: src/profile.c:170 tools/update-routes.py:134
+msgid "Bypass ranges must not include a /0 default route"
+msgstr "例外不能包含 /0 默认路由"
+
+#: src/profile.c:181
+msgid "Connection name must contain 1-128 bytes"
+msgstr "连接名称必须为 1–128 字节"
+
+#: src/profile.c:185
+msgid "Invalid proxy mode or IP mode"
+msgstr "代理或 IP 模式无效"
+
+#: src/profile.c:188
+msgid "Specify 1-8 DNS IP addresses"
+msgstr "请指定 1–8 个 DNS IP 地址"
+
+#: src/profile.c:191
+msgid "DNS addresses must be IP address strings"
+msgstr "DNS 必须为 IP 字符串"
+
+#: src/profile.c:195
+msgid "DNS must be a unicast IP reachable through the proxy, not a local stub"
+msgstr "DNS 必须为可经代理访问的单播 IP，不能使用本机 stub"
+
+#: src/profile.c:199
+msgid "Upstream DNS must not use the internal TUN addresses"
+msgstr "上游 DNS 不能使用本插件的 TUN 内部地址"
+
+#: src/profile.c:201
+msgid "DNS address family does not match the IP mode"
+msgstr "DNS 地址族与 IP 模式不一致"
+
+#: src/profile.c:212
+msgid "Regional CIDRs must cover each enabled address family"
+msgstr "区域列表必须包含每个启用地址族的 CIDR"
+
+#: src/profile.c:262
+msgid "Node index is out of range; indexes start at 0"
+msgstr "节点索引超出范围，索引从 0 开始"
+
+#: src/profile.c:268
+msgid "Single-node files only support index 0"
+msgstr "单节点文件只能选择索引 0"
+
+#: src/profile.c:301
+#, c-format
+msgid "Cannot create configuration file: %s"
+msgstr "创建配置文件失败：%s"
+
+#: src/profile.c:306
+#, c-format
+msgid "Cannot write configuration file"
+msgstr "写入配置失败"
+
+#: src/profile.c:309
+msgid "Cannot close configuration file"
+msgstr "关闭配置文件失败"
+
+#: src/profile.c:357
+msgid "Not a Shadowsocks VPN connection"
+msgstr "不是 Shadowsocks VPN 连接"
+
+#: src/profile.c:361
+msgid "Missing configuration"
+msgstr "缺少配置"
+
+#: src/plugin.c:42
+msgid ""
+"Plugin is missing or untrusted; install a supported system plugin or ask an "
+"administrator to register it in /usr/libexec/NetworkManager/shadowsocks/"
+"plugins"
+msgstr ""
+"插件不存在或不受信任；请安装支持的系统插件，或请管理员在 /usr/libexec/"
+"NetworkManager/shadowsocks/plugins 中注册插件"
+
+#: src/routes.c:112
+#, c-format
+msgid "IPv%u route batch failed: %s"
+msgstr "IPv%u 路由批处理失败：%s"
+
+#: src/routes.c:126
+#, c-format
+msgid "iproute2 failed: %s"
+msgstr "iproute2 失败：%s"
+
+#: src/routes.c:141
+msgid "iproute2 did not return a JSON array"
+msgstr "iproute2 未返回 JSON 数组"
+
+#: src/routes.c:156
+msgid ""
+"Routing tables 51820/51821 or rule priorities 10500/10501/10502/10503/10510/10511 are in "
+"use"
+msgstr "路由表 51820/51821 或规则优先级 10500/10501/10502/10503/10510/10511 被占用"
+
+#: src/runtime.c:46
+msgid "The VPN service must run as root"
+msgstr "VPN 服务需要 root"
+
+#: src/runtime.c:52
+msgid "Another Shadowsocks instance is running or the lock file is invalid"
+msgstr "已有 Shadowsocks 实例或锁文件无效"
+
+#: src/runtime.c:56
+msgid "The nmss-tun interface is already in use"
+msgstr "nmss-tun 接口已被占用"
+
+#: src/runtime.c:60
+#, c-format
+msgid "Cannot create runtime directory: %s"
+msgstr "无法创建运行目录：%s"
+
+#: src/runtime.c:91
+msgid "A plugin server must not also be an upstream DNS server"
+msgstr "插件服务器不能同时用作上游 DNS 服务器"
+
+#: src/runtime.c:111
+msgid ""
+"TUN startup timed out: check sslocal local-tun support, cipher and node key"
+msgstr "TUN 启动超时：请检查 sslocal 的 local-tun 特性、加密方式和节点密钥"
+
+#: src/runtime.c:121
+msgid "Cannot configure TUN rp_filter"
+msgstr "无法配置 TUN rp_filter"
+
+#: src/runtime.c:150
+#, c-format
+msgid "Route rollback failed: %s"
+msgstr "路由回滚失败：%s"
+
+#: src/runtime.c:156
+#, c-format
+msgid "Routing table cleanup failed: %s"
+msgstr "路由表清理失败：%s"
+
+#: src/service.c:36
+msgid "Shadowsocks backend exited"
+msgstr "Shadowsocks 后端退出"
+
+#: src/service.c:74
+#, c-format
+msgid "Startup failed: %s"
+msgstr "启动失败：%s"
+
+#: src/service.c:74
+msgid "Connection cancelled"
+msgstr "连接取消"
+
+#: src/service.c:87
+msgid "A connection is already running or being cleaned up"
+msgstr "已有连接正在运行或清理"
+
+#: src/service.c:133
+msgid "D-Bus service name"
+msgstr "D-Bus 服务名称"
+
+#: src/service.c:134
+msgid "Keep service after disconnect"
+msgstr "断开连接后保持服务运行"
+
+#: src/service.c:135
+msgid "Initialize D-Bus only, then exit"
+msgstr "仅初始化 D-Bus 后退出"
+
+#: src/service.c:146
+#, c-format
+msgid "D-Bus initialization failed: %s\n"
+msgstr "D-Bus 初始化失败：%s\n"
+
+#: tools/update-routes.py:55
+#, python-format
+msgid "Invalid RIR data: %s"
+msgstr "RIR 数据无效：%s"
+
+#: tools/update-routes.py:64
+msgid "Regions must be two-letter country/region codes"
+msgstr "区域必须使用两字母国家或地区代码"
+
+#: tools/update-routes.py:67
+msgid "Specify at least one region"
+msgstr "请至少指定一个区域"
+
+#: tools/update-routes.py:73 tools/update-routes.py:175
+msgid "Empty file or more than 32 MiB"
+msgstr "空文件或超过 32 MiB"
+
+#: tools/update-routes.py:86 tools/update-routes.py:93
+msgid "Invalid version date, record count or duplicate version header"
+msgstr "版本行日期、记录数量错误或重复版本行"
+
+#: tools/update-routes.py:96
+msgid "Registry header does not match the selected source"
+msgstr "注册局文件头与所选数据源不一致"
+
+#: tools/update-routes.py:104
+msgid "Selected region record has missing fields"
+msgstr "所选区域的记录缺少字段"
+
+#: tools/update-routes.py:108
+msgid "Invalid address count or prefix length"
+msgstr "地址数量或前缀长度错误"
+
+#: tools/update-routes.py:114 tools/update-routes.py:116
+msgid "Invalid address family"
+msgstr "地址族错误"
+
+#: tools/update-routes.py:119
+msgid "IPv4 range overflow"
+msgstr "IPv4 范围溢出"
+
+#: tools/update-routes.py:124
+msgid "IPv6 prefix length must be between 1 and 128"
+msgstr "IPv6 前缀长度应为 1–128"
+
+#: tools/update-routes.py:128
+msgid "IPv6 prefix is not aligned"
+msgstr "IPv6 前缀未对齐"
+
+#: tools/update-routes.py:137 tools/update-routes.py:154
+#: tools/update-routes.py:300
+msgid "Too many network prefixes"
+msgstr "网段数量超过上限"
+
+#: tools/update-routes.py:139
+msgid "Missing RIR header or mismatched record count; file may be incomplete"
+msgstr "缺少 RIR 文件头或记录总数不符，文件可能不完整"
+
+#: tools/update-routes.py:147
+#, python-format
+msgid "No records for the requested address families in regions: %s"
+msgstr "以下区域缺少所请求地址族的记录：%s"
+
+#: tools/update-routes.py:161
+msgid "Refusing a redirect to a non-HTTPS URL"
+msgstr "拒绝重定向到非 HTTPS 地址"
+
+#: tools/update-routes.py:169
+msgid "Download timed out"
+msgstr "下载超时"
+
+#: tools/update-routes.py:190
+#, python-format
+msgid "Download failed; keeping the old dataset: %s"
+msgstr "下载失败，保留旧库：%s"
+
+#: tools/update-routes.py:254
+msgid "Download and update regional IPv4/IPv6 prefixes"
+msgstr "下载并更新指定区域的 IPv4/IPv6 网段"
+
+#: tools/update-routes.py:256
+msgid "Convert local RIR delegated files (offline; repeatable)"
+msgstr "转换本地 RIR delegated 文件（离线，可重复指定）"
+
+#: tools/update-routes.py:258
+msgid "Country/region codes, comma-separated or repeatable (default: CN)"
+msgstr "国家或地区代码，以逗号分隔或重复指定（默认：CN）"
+
+#: tools/update-routes.py:260
+msgid "RIR source (default: apnic); all merges the five registries"
+msgstr "RIR 数据源（默认：apnic）；all 合并五个注册局"
+
+#: tools/update-routes.py:262
+msgid "Address families to export (default: dual)"
+msgstr "导出的地址族（默认：dual）"
+
+#: tools/update-routes.py:264
+msgid ""
+"Output directory (default: user data directory, or system state directory "
+"for root)"
+msgstr "输出目录（缺省为用户数据目录，root 使用系统状态目录）"
+
+#: tools/update-routes.py:270 tools/update-routes.py:302
+msgid ""
+"Custom regions or sources require --output to preserve the default China "
+"dataset"
+msgstr "自定义区域或数据源时必须指定 --output，以保留默认大陆网段库"
+
+#: tools/update-routes.py:287
+#, python-format
+msgid "Duplicate registry input: %s"
+msgstr "重复的注册局输入：%s"
+
+#: tools/update-routes.py:305
+#, python-format
+msgid ""
+"Updated regions %(regions)s: %(path)s\n"
+"Total prefixes: %(count)d\n"
+msgstr ""
+"已更新区域 %(regions)s：%(path)s\n"
+"网段总数：%(count)d\n"
+
+#: tools/update-routes.py:308
+msgid ""
+"For existing connections, select \"Use latest default prefixes\" in the "
+"editor, save and reconnect."
+msgstr "已有连接请在编辑器点击“使用最新默认网段”后保存并重连。"
+
+msgid "Loading saved passwords... You can also enter them manually."
+msgstr "正在读取已保存的密码……您也可以手动输入。"
+
+#, c-format
+msgid "Cannot load saved passwords: %s. Retry or enter the passwords to enable Apply."
+msgstr "无法读取已保存的密码：%s。请重试或输入密码以启用“应用”。"
+
+msgid "Saved passwords were not returned. Retry or enter the passwords to enable Apply."
+msgstr "未能取得已保存的密码。请重试或输入密码以启用“应用”。"
+
+msgid "v2ray-plugin accepts TCP only. For a native Shadowsocks UDP node, clear its plugin, options and arguments."
+msgstr "v2ray-plugin 的入口仅支持 TCP。配置原生 Shadowsocks UDP 节点时，请清空该节点的插件、选项和参数。"
+
+#: src/editor.c
+msgid "To change passwords while saved passwords are unavailable, enter passwords for both nodes."
+msgstr "无法读取已保存密码时，如需修改密码，请填写两个节点的密码。"
+
+#: src/editor.c
+msgid "Cannot load saved passwords: %s. Leave passwords unchanged to keep the saved values."
+msgstr "无法读取已保存密码：%s。不修改密码即可保留原来保存的值。"
+
+#: src/editor.c
+msgid "Saved passwords were not returned. Leave passwords unchanged to keep the saved values."
+msgstr "未返回已保存的密码。不修改密码即可保留原来保存的值。"
+
+#: src/editor.c
+msgid "Load or enter passwords before changing whether the UDP node shares the TCP node."
+msgstr "修改 UDP 是否共用 TCP 节点前，请先读取或填写密码。"
+
+#: src/editor.c
+msgid "Leave unchanged to keep the saved password"
+msgstr "不修改此项即可保留已保存的密码"
+
+#: src/auth-dialog.c
+msgid "Shadowsocks authentication"
+msgstr "Shadowsocks 身份验证"
+
+#: src/auth-dialog.c
+msgid "TCP node password"
+msgstr "TCP 节点密码"
+
+#: src/auth-dialog.c
+msgid "UDP node password"
+msgstr "UDP 节点密码"

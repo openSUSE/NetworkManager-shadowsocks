@@ -1,0 +1,7 @@
+{
+  "source": "https://ftp.apnic.net/stats/apnic/delegated-apnic-latest",
+  "serial": "20261113",
+  "ipv4_prefixes": 8798,
+  "ipv6_prefixes": 2048,
+  "sha256": "931d2605f27024562723e801c29cc18c6f204a41049d532da4723d248e7c0c34"
+}

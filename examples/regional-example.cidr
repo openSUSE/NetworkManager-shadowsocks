@@ -1,0 +1,4 @@
+# Format example ONLY. This is NOT a complete mainland China routing list.
+# Replace with a maintained, trusted IPv4 + IPv6 CIDR dataset before use.
+1.0.1.0/24
+2400:3200::/32

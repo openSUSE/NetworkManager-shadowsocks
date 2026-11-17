@@ -1,0 +1,20 @@
+{
+  "name": "Shadowsocks split TCP UDP",
+  "tcp": {
+    "server": "192.0.2.1",
+    "server_port": 8388,
+    "method": "aes-256-gcm",
+    "password": "replace-with-tcp-password"
+  },
+  "udp": {
+    "server": "2001:db8::2",
+    "server_port": 8388,
+    "method": "chacha20-ietf-poly1305",
+    "password": "replace-with-udp-password"
+  },
+  "mode": "lan",
+  "ip_mode": "dual",
+  "dns": ["1.1.1.1", "2606:4700:4700::1111"],
+  "china": [],
+  "bypass": []
+}
