@@ -41,6 +41,7 @@ struct _SsRuntime {
     gboolean tables_owned;
     int lock;
 };
+
 SsRuntime *ss_runtime_new(SsProfile *p) {
     SsRuntime *r = g_new0(SsRuntime, 1);
     r->profile = p;
@@ -48,22 +49,26 @@ SsRuntime *ss_runtime_new(SsProfile *p) {
     r->plan = ss_route_plan(p);
     return r;
 }
+
 SsProfile *ss_runtime_profile(SsRuntime *r) { return r->profile; }
 GSubprocess *ss_runtime_child(SsRuntime *r) { return r->child; }
 GInetAddress *ss_runtime_gateway(SsRuntime *r) { return r->gateway; }
 static gboolean cancelled(GCancellable *c, GError **error) {
     return g_cancellable_set_error_if_cancelled(c, error);
 }
+
 static gboolean write_secret(const char *path, const char *text, GError **error) {
     /* GFile replace with PRIVATE gives 0600 and does not expose credentials in argv. */
     g_autoptr(GFile) file = g_file_new_for_path(path);
     return g_file_replace_contents(file, text, strlen(text), NULL, FALSE,
         G_FILE_CREATE_PRIVATE, NULL, NULL, error);
 }
+
 static void backend_session(gpointer data) {
     (void) data;
     if (setsid() < 0) _exit(127);
 }
+
 gboolean ss_runtime_start(SsRuntime *r, GCancellable *cancel, GError **error) {
     if (geteuid() != 0) {
         g_set_error_literal(error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED, _("The VPN service must run as root")); return FALSE;
@@ -169,6 +174,7 @@ gboolean ss_runtime_start(SsRuntime *r, GCancellable *cancel, GError **error) {
     }
     return !cancelled(cancel, error);
 }
+
 void ss_runtime_free(SsRuntime *r) {
     if (!r) return;
     while (r->installed > r->route_count) {

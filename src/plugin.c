@@ -27,6 +27,7 @@
 
 /* Extra executables require an administrator-owned entry in this directory. */
 #define PLUGIN_DIR "/usr/libexec/NetworkManager/shadowsocks/plugins/"
+
 static gboolean trusted_path(const char *path) {
     g_autofree char *part = g_strdup(path);
     while (*part) {
@@ -39,6 +40,7 @@ static gboolean trusted_path(const char *path) {
     }
     return TRUE;
 }
+
 char *ss_plugin_resolve(const char *program, GError **error) {
     const char *known[] = {"obfs-local", "v2ray-plugin", "xray-plugin", "kcptun-client", "shadow-tls", NULL};
     g_autofree char *base = g_path_get_basename(program);

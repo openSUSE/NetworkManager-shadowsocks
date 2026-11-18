@@ -26,16 +26,19 @@
 #include <unistd.h>
 
 static const char *fixture = "{\"name\":\"Test\",\"tcp\":{\"server\":\"192.0.2.1\",\"server_port\":8388,\"method\":\"aes-256-gcm\",\"password\":\"tcp-secret\"},\"udp\":{\"server\":\"2001:db8::2\",\"server_port\":443,\"method\":\"chacha20-ietf-poly1305\",\"password\":\"udp-secret\"}}";
+
 static SsProfile *profile(void) {
     g_autoptr(GError) error = NULL;
     SsProfile *p = ss_profile_parse(fixture, &error);
     g_assert_no_error(error); g_assert_nonnull(p);
     return p;
 }
+
 static gboolean contains(GPtrArray *plan, const char *part) {
     for (guint i = 0; i < plan->len; i++) if (strstr(g_ptr_array_index(plan, i), part)) return TRUE;
     return FALSE;
 }
+
 static void independent(void) {
     g_autoptr(SsProfile) p = profile();
     g_autofree char *text = ss_backend_json(p);
@@ -55,6 +58,7 @@ static void independent(void) {
     g_assert_cmpstr(ss_string(local, "tun_interface_name"), ==, "nmss-tun");
 
 }
+
 static void shared(void) {
     g_autoptr(SsProfile) p = profile();
     json_object_remove_member(p->obj, "udp");
@@ -63,6 +67,7 @@ static void shared(void) {
     g_assert_nonnull(q);
     g_assert_cmpstr(ss_string(ss_node(q, 0), "password"), ==, ss_string(ss_node(q, 1), "password"));
 }
+
 static void secrets(void) {
     g_autoptr(SsProfile) p = profile();
     g_autofree char *public = ss_profile_json(p, FALSE);
@@ -81,6 +86,7 @@ static void secrets(void) {
     g_autoptr(SsProfile) rejected = ss_profile_from_connection(conn, TRUE, &error);
     g_assert_null(rejected); g_assert_nonnull(error);
 }
+
 static void invalid_node(void) {
     g_autoptr(SsProfile) p = profile();
     json_object_set_boolean_member(ss_node(p, 0), "server_port", TRUE);
@@ -92,6 +98,7 @@ static void invalid_node(void) {
     json_object_set_string_member(ss_node(p, 0), "server", "example.com;id");
     g_assert_false(ss_profile_validate(p, NULL));
 }
+
 static void plugins(void) {
     g_autoptr(SsProfile) p = profile();
     JsonObject *tcp = ss_node(p, 0), *udp = ss_node(p, 1);
@@ -180,6 +187,7 @@ static void plugins(void) {
     g_assert_null(ss_plugin_resolve("/usr/bin/sh", NULL));
     g_assert_null(ss_plugin_resolve("/usr/libexec/NetworkManager/shadowsocks/plugins/../../../../bin/sh", NULL));
 }
+
 static void dns_validation(void) {
     const char *invalid[] = {"127.0.0.53", "::1", "0.0.0.0", "ff02::1", "fe80::1", "dns.example", "198.18.0.1", "fd53:5353::1", NULL};
     for (guint i = 0; invalid[i]; i++) {
@@ -192,6 +200,7 @@ static void dns_validation(void) {
     json_object_set_string_member(p->obj, "ip_mode", "ipv4");
     g_assert_false(ss_profile_validate(p, NULL));
 }
+
 static void regional_validation(void) {
     g_autoptr(SsProfile) p = profile();
     json_object_set_string_member(p->obj, "mode", "china");
@@ -204,6 +213,7 @@ static void regional_validation(void) {
     json_array_add_string_element(array, "0.0.0.0/0");
     g_assert_false(ss_profile_validate(p, NULL));
 }
+
 static void routes(void) {
     g_autoptr(SsProfile) p = profile();
     g_autoptr(GPtrArray) plan = ss_route_plan(p);
@@ -222,6 +232,7 @@ static void routes(void) {
         g_assert_null(strstr(undo, " add ")); g_assert_nonnull(strstr(undo, " del "));
     }
 }
+
 static void modes(void) {
     g_autoptr(SsProfile) p = profile();
     json_object_set_string_member(p->obj, "mode", "global");
@@ -236,6 +247,7 @@ static void modes(void) {
     g_assert_true(contains(single, "-6 route add table 51821 unreachable default"));
     g_assert_false(contains(single, "-6 route add table 51821 default dev"));
 }
+
 static void dns_override(void) {
     g_autoptr(SsProfile) p = profile();
     JsonArray *dns = json_array_new(); json_array_add_string_element(dns, "10.1.2.3");
@@ -249,6 +261,7 @@ static void dns_override(void) {
     for (guint i = 0; i < plan->len; i++) if (strstr(g_ptr_array_index(plan, i), "10.1.2.3/32 dev")) count++;
     g_assert_cmpuint(count, ==, 2);
 }
+
 static void published_dns(void) {
     g_autoptr(SsProfile) p = profile();
     const char *gateways[] = {"192.0.2.10", "2001:db8::10"};
@@ -299,6 +312,7 @@ static void published_dns(void) {
         g_assert_cmpstr(domain, ==, "~.");
     }
 }
+
 static void file_io(void) {
     g_autofree char *dir = g_dir_make_tmp("nmss-test-XXXXXX", NULL);
     g_assert_nonnull(dir);
@@ -313,6 +327,7 @@ static void file_io(void) {
     g_assert_cmpint(symlink(path, link), ==, 0); g_assert_false(ss_profile_export(p, link, NULL));
     g_unlink(link); g_unlink(path); g_rmdir(dir);
 }
+
 static void import_nodes(void) {
     g_autofree char *dir = g_dir_make_tmp("nmss-import-XXXXXX", NULL);
     g_autofree char *path = g_build_filename(dir, "nodes.json", NULL);
@@ -327,6 +342,7 @@ static void import_nodes(void) {
     JsonArray *a = ss_cidrs_load(path, NULL); g_assert_nonnull(a); g_assert_cmpuint(json_array_get_length(a), ==, 2);
     json_array_unref(a); g_unlink(path); g_rmdir(dir);
 }
+
 static void bad_json(void) {
     const char *bad[] = {"[]", "null", "{", "{\"tcp\":false}", "{\"tcp\":{}}", NULL};
     for (guint i = 0; bad[i]; i++) { g_autoptr(GError) error = NULL;
@@ -334,6 +350,7 @@ static void bad_json(void) {
         g_assert_null(p); g_assert_nonnull(error);
     }
 }
+
 int main(int argc, char **argv) {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/dns/networkmanager-config", published_dns);

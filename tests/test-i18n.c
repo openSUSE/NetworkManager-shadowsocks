@@ -25,10 +25,12 @@
 
 int main(int argc, char **argv) {
     g_assert_cmpint(argc, ==, 3);
+    
     if (!setlocale(LC_ALL, "")) {
         g_print("Requested locale is not installed; skipping.\n");
         return 77;
     }
+    
     gboolean translated = !strcmp(argv[2], "translated");
     g_autofree char *host_domain = g_strdup(textdomain(NULL));
     ss_i18n_init();

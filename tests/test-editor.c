@@ -26,6 +26,7 @@
 #include <locale.h>
 
 static NMVpnEditorPlugin *plugin;
+
 static void import_export(void) {
     g_autoptr(GError) error = NULL;
     g_autoptr(NMConnection) conn = nm_vpn_editor_plugin_import(plugin, SOURCE_DIR "/examples/profile.json", &error);
@@ -41,6 +42,7 @@ static void import_export(void) {
     g_assert_cmpstr(ss_string(ss_node(p, 1), "password"), ==, ss_string(ss_node(q, 1), "password"));
     g_unlink(path); g_rmdir(dir);
 }
+
 static void metadata(void) {
     GModule *host = g_module_open(NULL, 0);
     gpointer symbol = NULL;
@@ -55,6 +57,7 @@ static void metadata(void) {
     g_assert_cmpstr(service, ==, SS_SERVICE);
     g_assert_true(nm_vpn_editor_plugin_get_capabilities(plugin) & NM_VPN_EDITOR_PLUGIN_CAPABILITY_IPV6);
 }
+
 static GtkWidget *find_widget(GtkWidget *root, const char *name) {
     if (!g_strcmp0(gtk_widget_get_name(root), name)) return root;
 #if GTK_CHECK_VERSION(4, 0, 0)
@@ -74,10 +77,12 @@ static GtkWidget *find_widget(GtkWidget *root, const char *name) {
 #endif
     return NULL;
 }
+
 static void count_changed(NMVpnEditor *editor, gpointer data) {
     (void) editor;
     (*(guint *) data)++;
 }
+
 static const char *password_text(GtkWidget *widget) {
 #if GTK_CHECK_VERSION(4, 0, 0)
     return gtk_editable_get_text(GTK_EDITABLE(widget));
@@ -85,6 +90,7 @@ static const char *password_text(GtkWidget *widget) {
     return gtk_entry_get_text(GTK_ENTRY(widget));
 #endif
 }
+
 static void set_password_text(GtkWidget *widget, const char *text) {
 #if GTK_CHECK_VERSION(4, 0, 0)
     gtk_editable_set_text(GTK_EDITABLE(widget), text);
@@ -92,6 +98,7 @@ static void set_password_text(GtkWidget *widget, const char *text) {
     gtk_entry_set_text(GTK_ENTRY(widget), text);
 #endif
 }
+
 static void ui(void) {
 #if GTK_CHECK_VERSION(4, 0, 0)
     if (!gtk_init_check()) { g_test_skip("No display server for GTK widget validation"); return; }
@@ -210,6 +217,7 @@ static void ui(void) {
 }
 static guint secret_calls;
 static gboolean secret_error;
+
 static void mock_method(GDBusConnection *bus, const char *sender, const char *path,
                         const char *interface, const char *method, GVariant *parameters,
                         GDBusMethodInvocation *invocation, gpointer data) {
@@ -268,6 +276,7 @@ static void secrets_async(void) {
     g_assert_no_error(error);
     guint secrets_id = g_dbus_connection_register_object(bus, "/org/freedesktop/NetworkManager/Settings/1", info->interfaces[1], &vtable, NULL, NULL, &error);
     g_assert_no_error(error);
+    
     for (guint attempt = 0; attempt < 2; attempt++) {
         secret_error = attempt == 1;
         g_autoptr(NMConnection) conn = nm_vpn_editor_plugin_import(plugin, SOURCE_DIR "/examples/profile.json", &error);
@@ -282,12 +291,14 @@ static void secrets_async(void) {
         GtkWidget *status = find_widget(root, "editor-status");
         if (!secret_error) set_password_text(tcp, "user-edited-test");
         gint64 deadline = g_get_monotonic_time() + 3 * G_TIME_SPAN_SECOND;
+        
         while ((secret_error
                 ? !strstr(gtk_label_get_text(GTK_LABEL(status)), "Test authorization failure")
                 : !*password_text(udp)) && g_get_monotonic_time() < deadline) {
             g_main_context_iteration(NULL, FALSE);
             g_usleep(1000);
         }
+        
         if (!secret_error) {
             g_assert_cmpstr(password_text(tcp), ==, "user-edited-test");
             g_assert_cmpstr(password_text(udp), ==, "stored-udp-test");
@@ -312,6 +323,7 @@ static void secrets_async(void) {
             g_assert_cmpstr(nm_setting_vpn_get_secret(nm_connection_get_setting_vpn(conn), "udp-password"), ==, "replacement-udp");
         }
     }
+    
     g_assert_cmpuint(secret_calls, ==, 2);
     g_dbus_connection_unregister_object(bus, settings_id);
     g_dbus_connection_unregister_object(bus, secrets_id);
@@ -319,6 +331,7 @@ static void secrets_async(void) {
     g_clear_object(&bus);
     g_test_dbus_down(daemon);
 }
+
 int main(int argc, char **argv) {
     setlocale(LC_ALL, "");
     g_test_init(&argc, &argv, NULL);

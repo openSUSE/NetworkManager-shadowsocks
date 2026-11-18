@@ -31,19 +31,24 @@
 #include <signal.h>
 
 static GSocket *udp_echo_socket, *tcp_echo_socket;
+
 static const guint8 query[] = {0x12, 0x34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 static void read_exact(GInputStream *in, void *buf, gsize len) {
     gsize count;
     g_assert_true(g_input_stream_read_all(in, buf, len, &count, NULL, NULL));
     g_assert_cmpuint(count, ==, len);
 }
+
 static void send_exact(GOutputStream *out, const void *buf, gsize len) {
     g_assert_true(g_output_stream_write_all(out, buf, len, NULL, NULL, NULL));
 }
+
 static GSocketAddress *endpoint(guint port) {
     g_autoptr(GInetAddress) ip = g_inet_address_new_from_string("127.0.0.1");
     return g_inet_socket_address_new(ip, port);
 }
+
 static GSocketConnection *connect_socks(guint8 command, guint8 reply[10]) {
     g_autoptr(GSocketClient) client = g_socket_client_new();
     g_socket_client_set_enable_proxy(client, FALSE);
@@ -66,6 +71,7 @@ static GSocketConnection *connect_socks(guint8 command, guint8 reply[10]) {
     g_assert_cmpuint(reply[3], ==, 1);
     return conn;
 }
+
 static gpointer tcp_echo(gpointer unused) {
     (void) unused;
     g_autoptr(GSocket) socket = g_socket_accept(tcp_echo_socket, NULL, NULL);
@@ -77,6 +83,7 @@ static gpointer tcp_echo(gpointer unused) {
     send_exact(g_io_stream_get_output_stream(G_IO_STREAM(conn)), packet, sizeof(packet));
     return NULL;
 }
+
 static gpointer udp_echo(gpointer unused) {
     (void) unused;
     guint8 packet[512];
@@ -107,10 +114,12 @@ static void protocol_selection(void) {
     g_assert_cmpuint(response[10], ==, query[0]); g_assert_true(response[12] & 0x80);
     g_thread_join(tcp_thread); g_thread_join(udp_thread);
 }
+
 static void child_setup(gpointer drop_bind) {
     if (prctl(PR_SET_PDEATHSIG, SIGKILL)) _exit(127);
     if (GPOINTER_TO_INT(drop_bind) && prctl(PR_CAPBSET_DROP, CAP_NET_BIND_SERVICE, 0, 0, 0)) _exit(127);
 }
+
 static GSubprocess *spawn_config(const char *program, const char *path, gboolean drop_bind) {
     g_autoptr(GSubprocessLauncher) launcher = g_subprocess_launcher_new(G_SUBPROCESS_FLAGS_STDOUT_SILENCE);
     g_subprocess_launcher_set_child_setup(launcher, child_setup, GINT_TO_POINTER(drop_bind), NULL);
@@ -122,6 +131,7 @@ static GSubprocess *spawn_config(const char *program, const char *path, gboolean
 static void stop(GSubprocess *child) {
     g_subprocess_force_exit(child); g_subprocess_wait(child, NULL, NULL); g_object_unref(child);
 }
+
 int main(int argc, char **argv) {
     g_autofree char *self = g_file_read_link("/proc/self/ns/net", NULL);
     const char *parent = g_getenv("SS_TEST_PARENT_NETNS");

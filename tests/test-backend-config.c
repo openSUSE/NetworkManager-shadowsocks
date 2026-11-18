@@ -22,13 +22,17 @@
 #include "ss.h"
 
 int main(int argc, char **argv) {
-    if (argc != 2) return 2;
+    if (argc != 2)
+        return 2;
+
     g_autoptr(GError) error = NULL;
     g_autoptr(SsProfile) profile = ss_profile_load(argv[1], &error);
+
     if (!profile) {
         g_printerr("%s\n", error->message);
         return 1;
     }
+
     g_autofree char *config = ss_backend_json(profile);
     g_print("%s\n", config);
     return 0;

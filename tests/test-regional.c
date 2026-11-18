@@ -27,7 +27,9 @@ static const char *fixture = "2|apnic|20261113|3|20261113|20261113|+0000\n"
     "apnic|CN|ipv4|192.0.2.1|6|20200101|allocated\n"
     "apnic|CN|ipv6|2001:db8::|32|20200101|assigned\n"
     "apnic|HK|ipv4|198.51.100.0|256|20200101|allocated\n";
+    
 static char *test_home;
+
 static void default_and_rollback(void) {
     g_autofree char *dir = g_build_filename(test_home, "NetworkManager-shadowsocks", "china", NULL);
     g_autofree char *input = g_build_filename(test_home, "delegated", NULL);
@@ -56,6 +58,7 @@ static void default_and_rollback(void) {
     g_unlink(input); g_unlink(bad); g_rmdir(dir);
     g_autofree char *parent = g_path_get_dirname(dir); g_rmdir(parent);
 }
+
 static void snapshot(void) {
     g_autoptr(GError) error = NULL;
     JsonArray *a = ss_cidrs_load(SOURCE_DIR "/data/china/china.cidr", &error);
@@ -65,7 +68,8 @@ static void snapshot(void) {
     g_assert_cmpuint(counts[0], >, 1000); g_assert_cmpuint(counts[1], >, 100);
     json_array_unref(a);
     g_autoptr(JsonParser) parser = json_parser_new();
-    g_assert_true(json_parser_load_from_file(parser, SOURCE_DIR "/data/china/china.json", &error)); g_assert_no_error(error);
+    g_assert_true(json_parser_load_from_file(parser, SOURCE_DIR "/data/china/china.json", &error));
+     g_assert_no_error(error);
     JsonObject *metadata = json_node_get_object(json_parser_get_root(parser));
     g_assert_cmpuint(counts[0], ==, json_object_get_int_member(metadata, "ipv4_prefixes"));
     g_assert_cmpuint(counts[1], ==, json_object_get_int_member(metadata, "ipv6_prefixes"));
@@ -78,10 +82,12 @@ static void snapshot(void) {
         g_assert_nonnull(a); g_assert_cmpuint(json_array_get_length(a), ==, counts[family]); json_array_unref(a);
     }
 }
+
 int main(int argc, char **argv) {
     test_home = g_dir_make_tmp("nmss-regional-test-XXXXXX", NULL); g_assert_nonnull(test_home);
     g_setenv("XDG_DATA_HOME", test_home, TRUE);
     g_test_init(&argc, &argv, NULL);
-    g_test_add_func("/regional/default-and-failed-update", default_and_rollback); g_test_add_func("/regional/bundled-snapshot-integrity", snapshot);
+    g_test_add_func("/regional/default-and-failed-update", default_and_rollback);
+    g_test_add_func("/regional/bundled-snapshot-integrity", snapshot);
     int result = g_test_run(); g_rmdir(test_home); g_free(test_home); return result;
 }

@@ -29,13 +29,16 @@ static void add_cidr(GHashTable *set, const char *cidr, guint family) {
         g_hash_table_add(set, g_strdup_printf("%s/%u", address, g_inet_address_mask_get_length(mask)));
     }
 }
+
 static void add_array(GHashTable *set, JsonArray *array, guint family) {
     for (guint i = 0; i < json_array_get_length(array); i++)
         add_cidr(set, json_array_get_string_element(array, i), family);
 }
+
 static gint compare_strings(gconstpointer a, gconstpointer b) {
     return g_strcmp0(*(char *const *) a, *(char *const *) b);
 }
+
 GPtrArray *ss_route_plan(SsProfile *p) {
     GPtrArray *plan = g_ptr_array_new_with_free_func(g_free);
     const char *special[] = {"0.0.0.0/8", "127.0.0.0/8", "224.0.0.0/4", "240.0.0.0/4",
@@ -117,6 +120,7 @@ GPtrArray *ss_route_plan(SsProfile *p) {
     }
     return plan;
 }
+
 char *ss_route_undo(const char *command) {
     const char *add = strstr(command, " add ");
     g_return_val_if_fail(add, NULL);
@@ -154,6 +158,7 @@ gboolean ss_route_tables_apply(GPtrArray *plan, GCancellable *cancel, GError **e
     }
     return TRUE;
 }
+
 gboolean ss_command(const char *command, char **output, GError **error) {
     g_auto(GStrv) argv = NULL;
     if (!g_shell_parse_argv(command, NULL, &argv, error)) return FALSE;
@@ -168,6 +173,7 @@ gboolean ss_command(const char *command, char **output, GError **error) {
     if (output) *output = g_steal_pointer(&stdout_text);
     return TRUE;
 }
+
 gboolean ss_routes_preflight(GError **error) {
     for (guint family = 4; family <= 6; family += 2) {
         for (guint type = 0; type < 2; type++) {

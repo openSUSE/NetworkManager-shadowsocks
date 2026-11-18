@@ -28,6 +28,7 @@
 
 static const char *methods[] = {"aes-128-gcm", "aes-256-gcm", "chacha20-ietf-poly1305",
     "2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305", NULL};
+    
 typedef struct {
     GObject parent;
     GtkWidget *root, *tabs, *same, *mode, *ip, *dns, *bypass, *regional_button, *status;
@@ -39,7 +40,9 @@ typedef struct {
     GCancellable *secrets_cancel;
     char *uuid;
 } SsEditor;
+
 typedef struct { GObjectClass parent; } SsEditorClass;
+
 static void editor_iface(NMVpnEditorInterface *iface);
 G_DEFINE_TYPE_WITH_CODE(SsEditor, ss_editor, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE(NM_TYPE_VPN_EDITOR, editor_iface))
@@ -51,24 +54,28 @@ static void changed(GtkWidget *widget, gpointer data) {
         if (widget == self->password[i]) self->password_edited[i] = TRUE;
     g_signal_emit_by_name(data, "changed");
 }
+
 static GtkWidget *entry(const char *text) {
     GtkWidget *e = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(e), text ? text : "");
     gtk_widget_set_hexpand(e, TRUE);
     return e;
 }
+
 static void row(GtkWidget *grid, guint n, const char *label, GtkWidget *widget) {
     GtkWidget *text = gtk_label_new(label);
     gtk_widget_set_halign(text, GTK_ALIGN_START);
     gtk_grid_attach(GTK_GRID(grid), text, 0, n, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), widget, 1, n, 1, 1);
 }
+
 static GtkWidget *combo(const char *const *ids, const char *const *labels, const char *value) {
     GtkWidget *w = gtk_combo_box_text_new();
     for (guint i = 0; ids[i]; i++) gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(w), ids[i], labels ? labels[i] : ids[i]);
     gtk_combo_box_set_active_id(GTK_COMBO_BOX(w), value);
     return w;
 }
+
 static void fill_node(SsEditor *self, guint i, JsonObject *node) {
     gtk_entry_set_text(GTK_ENTRY(self->server[i]), node ? ss_string(node, "server") : "");
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->port[i]), node ? json_object_get_int_member(node, "server_port") : 8388);
@@ -82,6 +89,7 @@ static void fill_node(SsEditor *self, guint i, JsonObject *node) {
     g_autofree char *text = args ? json_to_string(args, FALSE) : NULL;
     gtk_entry_set_text(GTK_ENTRY(self->plugin_args[i]), text ? text : "[]");
 }
+
 static void regional_label(SsEditor *self) {
     guint v4 = 0, v6 = 0;
     for (guint i = 0; i < json_array_get_length(self->regional); i++) {
@@ -90,6 +98,7 @@ static void regional_label(SsEditor *self) {
     g_autofree char *label = g_strdup_printf(_("Regional prefixes: IPv4 %u / IPv6 %u - Import custom list..."), v4, v6);
     gtk_button_set_label(GTK_BUTTON(self->regional_button), label);
 }
+
 static void regional_default_clicked(GtkButton *button, gpointer data) {
     (void) button;
     SsEditor *self = data;
@@ -101,6 +110,7 @@ static void regional_default_clicked(GtkButton *button, gpointer data) {
     regional_label(self); gtk_label_set_text(GTK_LABEL(self->status), source);
     changed(NULL, self);
 }
+
 typedef struct {
     SsEditor *editor;
     guint protocol;
@@ -139,6 +149,7 @@ static void import_response(GtkNativeDialog *dialog, int response, gpointer data
     g_object_unref(self);
     g_free(request);
 }
+
 static void choose(SsEditor *self, gboolean cidrs, guint protocol) {
 #if GTK_CHECK_VERSION(4, 0, 0)
     GtkRoot *top = gtk_widget_get_root(self->root);
@@ -157,19 +168,27 @@ static void choose(SsEditor *self, gboolean cidrs, guint protocol) {
     g_signal_connect(dialog, "response", G_CALLBACK(import_response), request);
     gtk_native_dialog_show(GTK_NATIVE_DIALOG(dialog));
 }
+
 static void import_clicked(GtkButton *button, gpointer data) {
     choose(data, FALSE, GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(button), "protocol")));
 }
+
 static void regional_clicked(GtkButton *button, gpointer data) {
     (void) button;
     choose(data, TRUE, 0);
 }
+
 static void same_toggled(SsCheckButton *button, gpointer data) {
     SsEditor *self = data;
     gtk_widget_set_sensitive(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->tabs), 1), !ss_check_button_get_active(button));
     changed(NULL, self);
 }
-static GObject *get_widget(NMVpnEditor *editor) { return G_OBJECT(((SsEditor *) editor)->root); }
+
+static GObject *get_widget(NMVpnEditor *editor)
+{
+    return G_OBJECT(((SsEditor *) editor)->root);
+}
+
 static JsonObject *collect_node(SsEditor *self, guint i, GError **error) {
     JsonObject *o = json_object_new();
     json_object_set_string_member(o, "server", gtk_entry_get_text(GTK_ENTRY(self->server[i])));
@@ -192,6 +211,7 @@ static JsonObject *collect_node(SsEditor *self, guint i, GError **error) {
     }
     return o;
 }
+
 static JsonArray *split_array(const char *text) {
     JsonArray *array = json_array_new();
     g_auto(GStrv) strings = g_strsplit(text, ",", -1);
@@ -201,6 +221,7 @@ static JsonArray *split_array(const char *text) {
     }
     return array;
 }
+
 static gboolean update_connection_impl(NMVpnEditor *editor, NMConnection *conn, GError **error) {
     SsEditor *self = (SsEditor *) editor;
     g_autoptr(SsProfile) p = ss_profile_new();
@@ -268,6 +289,7 @@ static gboolean update_connection_impl(NMVpnEditor *editor, NMConnection *conn, 
     }
     return TRUE;
 }
+
 static gboolean update_connection(NMVpnEditor *editor, NMConnection *conn, GError **error) {
     g_autoptr(GError) local_error = NULL;
     gboolean ok = update_connection_impl(editor, conn, &local_error);
@@ -277,10 +299,12 @@ static gboolean update_connection(NMVpnEditor *editor, NMConnection *conn, GErro
     if (local_error) g_propagate_error(error, g_steal_pointer(&local_error));
     return ok;
 }
+
 static void editor_iface(NMVpnEditorInterface *iface) {
     iface->get_widget = get_widget;
     iface->update_connection = update_connection;
 }
+
 static void ss_editor_finalize(GObject *object) {
     SsEditor *self = (SsEditor *) object;
     if (self->root) {
@@ -295,8 +319,17 @@ static void ss_editor_finalize(GObject *object) {
     json_array_unref(self->regional);
     G_OBJECT_CLASS(ss_editor_parent_class)->finalize(object);
 }
-static void ss_editor_class_init(SsEditorClass *klass) { G_OBJECT_CLASS(klass)->finalize = ss_editor_finalize; }
-static void ss_editor_init(SsEditor *self) { self->regional = json_array_new(); }
+
+static void ss_editor_class_init(SsEditorClass *klass)
+{
+    G_OBJECT_CLASS(klass)->finalize = ss_editor_finalize;
+}
+
+static void ss_editor_init(SsEditor *self)
+{
+    self->regional = json_array_new();
+}
+
 static char *join_array(JsonArray *array) {
     GString *s = g_string_new(NULL);
     for (guint i = 0; i < json_array_get_length(array); i++) {
@@ -305,17 +338,20 @@ static char *join_array(JsonArray *array) {
     }
     return g_string_free(s, FALSE);
 }
+
 /* Hosts may give us a cloned connection with no secrets. Never block the UI
  * while contacting NetworkManager, and never overwrite a user's password edit. */
 typedef struct {
     GWeakRef editor;
     GDBusConnection *bus;
 } SecretRequest;
+
 static void secret_request_free(SecretRequest *request) {
     g_weak_ref_clear(&request->editor);
     g_clear_object(&request->bus);
     g_free(request);
 }
+
 static void secrets_complete(SecretRequest *request, GVariant *settings, const GError *error) {
     g_autoptr(GObject) object = g_weak_ref_get(&request->editor);
     if (object) {
@@ -343,6 +379,7 @@ static void secrets_complete(SecretRequest *request, GVariant *settings, const G
     }
     secret_request_free(request);
 }
+
 static void secrets_loaded(GObject *source, GAsyncResult *result, gpointer data) {
     SecretRequest *request = data;
     g_autoptr(GError) error = NULL;
@@ -350,6 +387,7 @@ static void secrets_loaded(GObject *source, GAsyncResult *result, gpointer data)
     g_autoptr(GVariant) settings = reply ? g_variant_get_child_value(reply, 0) : NULL;
     secrets_complete(request, settings, error);
 }
+
 static void secrets_path_ready(GObject *source, GAsyncResult *result, gpointer data) {
     SecretRequest *request = data;
     g_autoptr(GError) error = NULL;
@@ -372,6 +410,7 @@ static void secrets_path_ready(GObject *source, GAsyncResult *result, gpointer d
     }
     secrets_complete(request, NULL, error);
 }
+
 static void secrets_bus_ready(GObject *source, GAsyncResult *result, gpointer data) {
     (void) source;
     SecretRequest *request = data;
@@ -388,6 +427,7 @@ static void secrets_bus_ready(GObject *source, GAsyncResult *result, gpointer da
     }
     secrets_complete(request, NULL, error);
 }
+
 static void load_passwords(SsEditor *self) {
     if (!self->uuid || self->secrets_loading) return;
     self->secrets_loading = TRUE;
@@ -398,6 +438,7 @@ static void load_passwords(SsEditor *self) {
     g_weak_ref_init(&request->editor, self);
     g_bus_get(G_BUS_TYPE_SYSTEM, self->secrets_cancel, secrets_bus_ready, request);
 }
+
 static NMVpnEditor *new_editor(NMConnection *conn, GError **error) {
     g_autoptr(SsProfile) p = NULL;
     NMSettingVpn *vpn = conn ? nm_connection_get_setting_vpn(conn) : NULL;

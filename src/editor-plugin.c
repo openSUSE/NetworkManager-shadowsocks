@@ -27,6 +27,7 @@
 typedef struct { GObject parent; } SsPlugin;
 typedef struct { GObjectClass parent; } SsPluginClass;
 static void plugin_iface(NMVpnEditorPluginInterface *iface);
+
 G_DEFINE_TYPE_WITH_CODE(SsPlugin, ss_plugin, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE(NM_TYPE_VPN_EDITOR_PLUGIN, plugin_iface))
 static void plugin_get_property(GObject *object, guint id, GValue *value, GParamSpec *pspec) {
@@ -36,7 +37,9 @@ static void plugin_get_property(GObject *object, guint id, GValue *value, GParam
     else if (id == 3) g_value_set_string(value, SS_SERVICE);
     else G_OBJECT_WARN_INVALID_PROPERTY_ID(object, id, pspec);
 }
+
 static void ss_plugin_init(SsPlugin *self) { (void) self; }
+
 static void ss_plugin_class_init(SsPluginClass *klass) {
     GObjectClass *object = G_OBJECT_CLASS(klass);
     object->get_property = plugin_get_property;
@@ -44,6 +47,7 @@ static void ss_plugin_class_init(SsPluginClass *klass) {
     g_object_class_override_property(object, 2, NM_VPN_EDITOR_PLUGIN_DESCRIPTION);
     g_object_class_override_property(object, 3, NM_VPN_EDITOR_PLUGIN_SERVICE);
 }
+
 static NMVpnEditor *plugin_editor(NMVpnEditorPlugin *plugin, NMConnection *conn, GError **error) {
     (void) plugin;
     typedef NMVpnEditor *(*EditorFactory)(NMConnection *, GError **);
@@ -81,10 +85,12 @@ static NMVpnEditor *plugin_editor(NMVpnEditorPlugin *plugin, NMConnection *conn,
     g_module_close(module);
     return editor;
 }
+
 static NMVpnEditorPluginCapability capabilities(NMVpnEditorPlugin *plugin) {
     (void) plugin;
     return NM_VPN_EDITOR_PLUGIN_CAPABILITY_IMPORT | NM_VPN_EDITOR_PLUGIN_CAPABILITY_EXPORT | NM_VPN_EDITOR_PLUGIN_CAPABILITY_IPV6;
 }
+
 static NMConnection *import_file(NMVpnEditorPlugin *plugin, const char *path, GError **error) {
     (void) plugin;
     g_autoptr(SsProfile) p = ss_profile_load(path, NULL);
@@ -97,20 +103,24 @@ static NMConnection *import_file(NMVpnEditorPlugin *plugin, const char *path, GE
     }
     return ss_connection_new(p, error);
 }
+
 static gboolean export_file(NMVpnEditorPlugin *plugin, const char *path, NMConnection *conn, GError **error) {
     (void) plugin;
     g_autoptr(SsProfile) p = ss_profile_from_connection(conn, TRUE, error);
     return p && ss_profile_export(p, path, error);
 }
+
 static char *suggested(NMVpnEditorPlugin *plugin, NMConnection *conn) {
     (void) plugin; (void) conn;
     return g_strdup("shadowsocks.json");
 }
+
 static void plugin_iface(NMVpnEditorPluginInterface *iface) {
     iface->get_editor = plugin_editor; iface->get_capabilities = capabilities;
     iface->import_from_file = import_file; iface->export_to_file = export_file;
     iface->get_suggested_filename = suggested;
 }
+
 G_MODULE_EXPORT NMVpnEditorPlugin *nm_vpn_editor_plugin_factory(GError **error) {
     (void) error;
     ss_i18n_bind();

@@ -31,6 +31,7 @@ static void command(const char *text) {
     g_assert_true(ss_command(text, NULL, &error));
     g_assert_no_error(error);
 }
+
 static void expect_route(guint family, const char *destination, const char *proto, const char *mark, const char *device) {
     g_autofree char *cmd = g_strdup_printf(SS_IP " -%u route get %s ipproto %s %s", family, destination, proto, mark ? mark : "");
     g_autofree char *output = NULL;
@@ -44,6 +45,7 @@ static void expect_route(guint family, const char *destination, const char *prot
         g_assert_false(ok); g_assert_nonnull(error);
     }
 }
+
 static void cleanup(void) {
     for (guint i = active_plan->len; i > 0; i--) {
         const char *entry = g_ptr_array_index(active_plan, i - 1);
@@ -59,6 +61,7 @@ static void cleanup(void) {
         }
     }
 }
+
 static void apply(SsProfile *p) {
     g_autoptr(GError) error = NULL;
     g_assert_true(ss_profile_validate(p, &error)); g_assert_no_error(error);
@@ -73,12 +76,14 @@ static void apply(SsProfile *p) {
     for (; i < plan->len; i++) command(g_ptr_array_index(plan, i));
     active_plan = g_steal_pointer(&plan);
 }
+
 static SsProfile *profile(const char *mode) {
     SsProfile *p = ss_profile_load(SOURCE_DIR "/examples/profile.json", NULL);
     g_assert_nonnull(p);
     json_object_set_string_member(p->obj, "mode", mode);
     return p;
 }
+
 static void split_and_lan(void) {
     g_autoptr(SsProfile) p = profile("lan");
     apply(p);
@@ -91,6 +96,7 @@ static void split_and_lan(void) {
     expect_route(4, "8.8.8.8", "tcp", "mark 0x5353", "uplink");
     cleanup();
 }
+
 static void regional_and_dns(void) {
     g_autoptr(SsProfile) p = profile("china");
     JsonArray *regional = json_object_get_array_member(p->obj, "china");
@@ -107,6 +113,7 @@ static void regional_and_dns(void) {
     expect_route(6, "2606:4700:4700::1111", "udp", "oif nmss-tun", "nmss-tun");
     cleanup();
 }
+
 static void single_family(void) {
     g_autoptr(SsProfile) p = profile("global");
     json_object_set_string_member(p->obj, "ip_mode", "ipv4");
@@ -121,6 +128,7 @@ static void single_family(void) {
     command(SS_IP " -4 route add default dev uplink");
     cleanup();
 }
+
 static void plugin_endpoints(void) {
     g_autoptr(SsProfile) p = profile("global");
     json_object_set_string_member(ss_node(p, 0), "server", "203.0.113.9");
@@ -136,6 +144,7 @@ static void plugin_endpoints(void) {
     expect_route(6, "2001:4860:4860::8888", "udp", NULL, "nmss-tun");
     cleanup();
 }
+
 static void conflicts(void) {
     g_autoptr(GError) error = NULL;
     command(SS_IP " -4 rule add priority 20000 lookup 51820");
@@ -149,6 +158,7 @@ static void conflicts(void) {
     command(SS_IP " -4 route flush table 51821");
     g_assert_true(ss_routes_preflight(&error)); g_assert_no_error(error);
 }
+
 static void bundled_regional(void) {
     g_autoptr(SsProfile) p = profile("china");
     JsonArray *cidrs = ss_cidrs_load(SOURCE_DIR "/data/china/china.cidr", NULL);
@@ -160,24 +170,29 @@ static void bundled_regional(void) {
     expect_route(4, "8.8.8.8", "udp", NULL, "nmss-tun");
     cleanup();
 }
+
 int main(int argc, char **argv) {
     g_autofree char *self = g_file_read_link("/proc/self/ns/net", NULL);
     const char *initial = g_getenv("SS_TEST_PARENT_NETNS");
+    
     if (getuid() != 0 || !self || !initial || !g_str_has_prefix(initial, "net:[") || !strcmp(self, initial)) {
         g_printerr("Refusing: use tests/run-netns.sh %s\n", argv[0]);
         return 77;
     }
+    
     g_test_init(&argc, &argv, NULL);
     command(SS_IP " link set lo up");
     const char *devices[] = {"uplink", "nmss-tun"};
     const char *v4[] = {"192.0.2.100/24", "198.18.0.1/30", "198.18.0.5/30"};
     const char *v6[] = {"2001:db8:10::1/64", "fd53:5353::1/126", "fd53:5353::5/126"};
+    
     for (guint i = 0; i < G_N_ELEMENTS(devices); i++) {
         g_autofree char *link = g_strdup_printf(SS_IP " link add %s type dummy", devices[i]); command(link);
         g_autofree char *up = g_strdup_printf(SS_IP " link set %s up", devices[i]); command(up);
         g_autofree char *addr4 = g_strdup_printf(SS_IP " -4 addr add %s dev %s", v4[i], devices[i]); command(addr4);
         g_autofree char *addr6 = g_strdup_printf(SS_IP " -6 addr add %s dev %s nodad", v6[i], devices[i]); command(addr6);
     }
+    
     command(SS_IP " -4 route add default dev uplink"); command(SS_IP " -6 route add default dev uplink");
     g_test_add_func("/live/plugin-endpoints", plugin_endpoints);
     g_test_add_func("/live/split-and-lan", split_and_lan);

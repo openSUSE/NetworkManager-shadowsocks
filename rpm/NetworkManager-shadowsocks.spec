@@ -42,18 +42,20 @@ Requires:       shadowsocks-rust
 Recommends:     %{name}-tools = %{version}-%{release}
 Suggests:       %{name}-gnome = %{version}-%{release}
 
+%lang_package
+
 %description
 A NetworkManager VPN plugin using the shadowsocks-rust TUN backend for
 transparent TCP and UDP proxying. It supports separate TCP and UDP nodes,
 IPv4 and IPv6, configurable DNS, LAN bypass and regional IP bypass. A bundled
 dual-stack China allocation snapshot is included for offline use.
 
-%package gnome
+%package -n NetworkManager-applet-shadowsocks
 Summary:        GTK editor for NetworkManager Shadowsocks connections
 Group:          Productivity/Networking/System
 Requires:       %{name} = %{version}-%{release}
 
-%description gnome
+%description -n NetworkManager-applet-shadowsocks
 The native GTK 3 and GTK 4 VPN editor modules for NetworkManager Shadowsocks. They support
 manual node configuration, JSON import, separate TCP and UDP nodes, DNS
 settings and custom bypass CIDR lists.
@@ -103,7 +105,7 @@ sh tests/run-ui.sh %{_vpath_builddir}/test-editor
 sh tests/run-ui.sh %{_vpath_builddir}/test-editor-gtk4
 %endif
 
-%files -f %{name}.lang
+%files
 %license COPYING
 %doc README.md README-zh_CN.md
 %{_bindir}/nm-shadowsocks
@@ -115,7 +117,7 @@ sh tests/run-ui.sh %{_vpath_builddir}/test-editor-gtk4
 %dir %{_localstatedir}/lib/%{name}
 %dir %{_localstatedir}/lib/%{name}/china
 
-%files gnome
+%files -n NetworkManager-applet-shadowsocks
 %{_libexecdir}/nm-shadowsocks-auth-dialog
 %{_libdir}/NetworkManager/libnm-vpn-plugin-shadowsocks.so
 %{_libdir}/NetworkManager/libnm-vpn-plugin-shadowsocks-editor.so
@@ -125,5 +127,7 @@ sh tests/run-ui.sh %{_vpath_builddir}/test-editor-gtk4
 %license COPYING
 %doc README.md README-zh_CN.md
 %{_bindir}/nm-shadowsocks-update-routes
+
+%files lang -f %{name}.lang
 
 %changelog

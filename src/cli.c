@@ -35,6 +35,7 @@ static void added(GObject *source, GAsyncResult *res, gpointer data) {
     }
     g_main_loop_quit(w->loop);
 }
+
 static void updated(GObject *source, GAsyncResult *res, gpointer data) {
     Wait *w = data;
     g_autoptr(GVariant) result = nm_remote_connection_update2_finish(NM_REMOTE_CONNECTION(source), res, &w->error);
@@ -42,6 +43,7 @@ static void updated(GObject *source, GAsyncResult *res, gpointer data) {
     if (w->ok) g_print(_("Updated: %s\n"), nm_connection_get_uuid(NM_CONNECTION(source)));
     g_main_loop_quit(w->loop);
 }
+
 static gboolean save(SsProfile *p, const char *uuid, GError **error) {
     g_autoptr(NMClient) client = nm_client_new(NULL, error);
     if (!client) return FALSE;
@@ -69,6 +71,7 @@ static gboolean save(SsProfile *p, const char *uuid, GError **error) {
     if (w.error) g_propagate_error(error, w.error);
     return w.ok;
 }
+
 int main(int argc, char **argv) {
     ss_i18n_init();
     g_autofree char *tcp = NULL, *udp = NULL, *name = NULL, *mode = NULL, *ip_mode = NULL;
@@ -96,8 +99,15 @@ int main(int argc, char **argv) {
     g_autoptr(GError) error = NULL;
     g_autoptr(SsProfile) p = NULL;
     if (!g_option_context_parse(ctx, &argc, &argv, &error)) goto fail;
+    
     if (version) { g_print("%s\n", SS_VERSION); return 0; }
-    if (argc < 2) { g_autofree char *help = g_option_context_get_help(ctx, TRUE, NULL); g_print("%s", help); return 1; }
+    
+    if (argc < 2) {
+        g_autofree char *help = g_option_context_get_help(ctx, TRUE, NULL);
+        g_print("%s", help);
+        return 1; 
+    }
+    
     if (!strcmp(argv[1], "list")) {
         g_autoptr(NMClient) client = nm_client_new(NULL, &error);
         if (!client) goto fail;
@@ -110,6 +120,7 @@ int main(int argc, char **argv) {
         }
         return 0;
     }
+    
     if (!strcmp(argv[1], "import")) {
         if (!tcp || tcp_index < 0 || udp_index < 0) {
             g_set_error_literal(&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _("Specify --tcp and non-negative node indexes")); goto fail;
@@ -120,15 +131,23 @@ int main(int argc, char **argv) {
             if (!node) goto fail;
             json_object_set_object_member(p->obj, i == 0 ? "tcp" : "udp", node);
         }
-        if (name) json_object_set_string_member(p->obj, "name", name);
-        if (mode) json_object_set_string_member(p->obj, "mode", mode);
-        if (ip_mode) json_object_set_string_member(p->obj, "ip_mode", ip_mode);
+        
+        if (name)
+            json_object_set_string_member(p->obj, "name", name);
+        
+        if (mode)
+            json_object_set_string_member(p->obj, "mode", mode);
+            
+        if (ip_mode) 
+            json_object_set_string_member(p->obj, "ip_mode", ip_mode);
+            
         if (dns || (ip_mode && strcmp(ip_mode, "dual"))) {
             g_auto(GStrv) servers = g_strsplit(dns ? dns : (!strcmp(ip_mode, "ipv4") ? "1.1.1.1" : "2606:4700:4700::1111"), ",", -1);
             JsonArray *array = json_array_new();
             for (guint i = 0; servers[i]; i++) json_array_add_string_element(array, g_strstrip(servers[i]));
             json_object_set_array_member(p->obj, "dns", array);
         }
+        
         for (guint i = 0; i < 2; i++) {
             const char *path = i == 0 ? regional : bypass;
             if (path) {
@@ -156,9 +175,13 @@ int main(int argc, char **argv) {
     } else {
         g_set_error_literal(&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _("Unknown command")); goto fail;
     }
-    if (!save(p, uuid, &error)) goto fail;
+    
+    if (!save(p, uuid, &error))
+        goto fail;
     return 0;
-fail:
-    g_printerr(_("Error: %s\n"), error ? error->message : _("Operation failed"));
+    
+    fail:
+        g_printerr(_("Error: %s\n"), error ? error->message : _("Operation failed"));
+        
     return 1;
 }

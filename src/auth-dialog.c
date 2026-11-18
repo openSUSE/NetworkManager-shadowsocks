@@ -18,8 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 #include "ss.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -31,6 +29,7 @@ int main(int argc, char **argv) {
     char *uuid = NULL, *name = NULL, *service = NULL;
     char **hints = NULL;
     gboolean external = FALSE, allow = FALSE, retry = FALSE;
+    
     GOptionEntry options[] = {
         {"uuid", 'u', 0, G_OPTION_ARG_STRING, &uuid, NULL, NULL},
         {"name", 'n', 0, G_OPTION_ARG_STRING, &name, NULL, NULL},
@@ -41,6 +40,7 @@ int main(int argc, char **argv) {
         {"hint", 't', 0, G_OPTION_ARG_STRING_ARRAY, &hints, NULL, NULL},
         {NULL}
     };
+    
     ss_i18n_init();
     g_autoptr(GOptionContext) context = g_option_context_new(NULL);
     g_option_context_add_main_entries(context, options, NULL);
@@ -49,15 +49,20 @@ int main(int argc, char **argv) {
     g_autoptr(GHashTable) secrets = NULL;
     g_autoptr(GKeyFile) output = g_key_file_new();
     g_autoptr(GString) legacy = g_string_new(NULL);
+    
     int result = 1;
+    
     if (!g_option_context_parse(context, &argc, &argv, &error) ||
         !uuid || !name || g_strcmp0(service, SS_SERVICE)) goto out;
+        
     if (!nm_vpn_service_plugin_read_vpn_details(STDIN_FILENO, &data, &secrets)) goto out;
+    
     g_key_file_set_integer(output, "VPN Plugin UI", "Version", 2);
     g_key_file_set_string(output, "VPN Plugin UI", "Title", _("Shadowsocks authentication"));
     g_key_file_set_string(output, "VPN Plugin UI", "Description", name);
     const char *keys[] = {"tcp-password", "udp-password"};
     const char *labels[] = {_("TCP node password"), _("UDP node password")};
+    
     for (guint i = 0; i < G_N_ELEMENTS(keys); i++) {
         const char *value = g_hash_table_lookup(secrets, keys[i]);
         gboolean ask = allow && (retry || !value || !*value);
@@ -71,12 +76,19 @@ int main(int argc, char **argv) {
             g_string_append_printf(legacy, "%s\n%s\n", keys[i], value);
         }
     }
+    
     if (external) {
         g_autofree char *text = g_key_file_to_data(output, NULL, NULL);
         fputs(text, stdout);
     } else { fputs(legacy->str, stdout); fputs("\n\n", stdout); }
+    
     result = fflush(stdout) == 0 ? 0 : 1;
+    
 out:
-    g_free(uuid); g_free(name); g_free(service); g_strfreev(hints);
+    g_free(uuid);
+    g_free(name);
+    g_free(service);
+    g_strfreev(hints);
+    
     return result;
 }

@@ -33,6 +33,7 @@ typedef struct {
     GMainLoop *loop;
 } SsService;
 typedef struct { NMVpnServicePluginClass parent; } SsServiceClass;
+
 G_DEFINE_TYPE(SsService, ss_service, NM_TYPE_VPN_SERVICE_PLUGIN)
 
 static void stop_runtime(SsService *self) {
@@ -42,6 +43,7 @@ static void stop_runtime(SsService *self) {
         g_clear_object(&self->cancel);
     }
 }
+
 static gboolean disconnect_vpn(NMVpnServicePlugin *plugin, GError **error) {
     (void) error;
     SsService *self = (SsService *) plugin;
@@ -49,6 +51,7 @@ static gboolean disconnect_vpn(NMVpnServicePlugin *plugin, GError **error) {
     stop_runtime(self);
     return TRUE;
 }
+
 static void child_exited(GObject *child, GAsyncResult *res, gpointer data) {
     SsService *self = data;
     g_subprocess_wait_finish(G_SUBPROCESS(child), res, NULL);
@@ -60,6 +63,7 @@ static void child_exited(GObject *child, GAsyncResult *res, gpointer data) {
     }
     g_object_unref(self);
 }
+
 static void publish(SsService *self) {
     SsProfile *p = ss_runtime_profile(self->runtime);
     g_autoptr(GVariant) general = ss_general_config(p, ss_runtime_gateway(self->runtime));
@@ -71,12 +75,14 @@ static void publish(SsService *self) {
         else nm_vpn_service_plugin_set_ip6_config(NM_VPN_SERVICE_PLUGIN(self), config_ip);
     }
 }
+
 static void start_worker(GTask *task, gpointer source, gpointer task_data, GCancellable *cancel) {
     (void) source;
     g_autoptr(GError) error = NULL;
     if (!ss_runtime_start(task_data, cancel, &error)) g_task_return_error(task, g_steal_pointer(&error));
     else g_task_return_boolean(task, TRUE);
 }
+
 static void start_done(GObject *source, GAsyncResult *res, gpointer unused) {
     (void) unused;
     SsService *self = (SsService *) source;
@@ -96,6 +102,7 @@ static void start_done(GObject *source, GAsyncResult *res, gpointer unused) {
     }
     if (self->quitting) g_main_loop_quit(self->loop);
 }
+
 static gboolean connect_vpn(NMVpnServicePlugin *plugin, NMConnection *conn, GError **error) {
     SsService *self = (SsService *) plugin;
     if (self->runtime) {
@@ -112,6 +119,7 @@ static gboolean connect_vpn(NMVpnServicePlugin *plugin, NMConnection *conn, GErr
     g_task_run_in_thread(task, start_worker);
     return TRUE;
 }
+
 static gboolean need_secrets(NMVpnServicePlugin *plugin, NMConnection *conn, const char **setting, GError **error) {
     (void) plugin; (void) error;
     NMSettingVpn *vpn = nm_connection_get_setting_vpn(conn);
@@ -121,6 +129,7 @@ static gboolean need_secrets(NMVpnServicePlugin *plugin, NMConnection *conn, con
     }
     return FALSE;
 }
+
 static void ss_service_init(SsService *self) { (void) self; }
 static void ss_service_class_init(SsServiceClass *klass) {
     NMVpnServicePluginClass *vpn = NM_VPN_SERVICE_PLUGIN_CLASS(klass);
@@ -128,6 +137,7 @@ static void ss_service_class_init(SsServiceClass *klass) {
     vpn->disconnect = disconnect_vpn;
     vpn->need_secrets = need_secrets;
 }
+
 static gboolean request_quit(gpointer data) {
     SsService *self = data;
     self->quitting = TRUE;
@@ -136,10 +146,12 @@ static gboolean request_quit(gpointer data) {
     if (!self->starting) g_main_loop_quit(self->loop);
     return G_SOURCE_REMOVE;
 }
+
 static void quit_signal(NMVpnServicePlugin *plugin, gpointer unused) {
     (void) unused;
     request_quit(plugin);
 }
+
 int main(int argc, char **argv) {
     ss_i18n_init();
     char *name = NULL;

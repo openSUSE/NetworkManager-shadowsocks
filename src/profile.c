@@ -31,24 +31,29 @@ static gboolean fail(GError **error, const char *message) {
     g_set_error_literal(error, SS_ERROR, G_IO_ERROR_INVALID_DATA, message);
     return FALSE;
 }
+
 const char *ss_string(JsonObject *o, const char *key) {
     JsonNode *n = o ? json_object_get_member(o, key) : NULL;
     return n && JSON_NODE_HOLDS_VALUE(n) && json_node_get_value_type(n) == G_TYPE_STRING
         ? json_node_get_string(n) : "";
 }
+
 static JsonObject *object_member(JsonObject *o, const char *key) {
     JsonNode *n = json_object_get_member(o, key);
     return n && JSON_NODE_HOLDS_OBJECT(n) ? json_node_get_object(n) : NULL;
 }
+
 static JsonArray *array_member(JsonObject *o, const char *key) {
     JsonNode *n = json_object_get_member(o, key);
     return n && JSON_NODE_HOLDS_ARRAY(n) ? json_node_get_array(n) : NULL;
 }
+
 static char *serialize(JsonObject *o) {
     g_autoptr(JsonNode) root = json_node_new(JSON_NODE_OBJECT);
     json_node_set_object(root, o);
     return json_to_string(root, TRUE);
 }
+
 static JsonObject *copy_object(JsonObject *o) {
     /* json_node_copy shares containers. Parse a serialization for a deep copy. */
     g_autofree char *text = serialize(o);
@@ -57,6 +62,7 @@ static JsonObject *copy_object(JsonObject *o) {
         return NULL;
     return json_node_dup_object(json_parser_get_root(parser));
 }
+
 static JsonObject *parse_object(const char *text, GError **error) {
     g_autoptr(JsonParser) parser = json_parser_new();
     if (strlen(text) > SS_MAX_CONFIG) {
@@ -72,6 +78,7 @@ static JsonObject *parse_object(const char *text, GError **error) {
     }
     return json_node_dup_object(root);
 }
+
 static char *read_bounded(const char *path, GError **error) {
     g_autoptr(GFile) file = g_file_new_for_path(path);
     g_autoptr(GFileInputStream) stream = g_file_read(file, NULL, error);
@@ -94,6 +101,7 @@ static char *read_bounded(const char *path, GError **error) {
     }
     return g_string_free(text, FALSE);
 }
+
 SsProfile *ss_profile_new(void) {
     SsProfile *p = g_new0(SsProfile, 1);
     p->obj = json_object_new();
@@ -108,12 +116,15 @@ SsProfile *ss_profile_new(void) {
     json_object_set_array_member(p->obj, "bypass", json_array_new());
     return p;
 }
+
 void ss_profile_free(SsProfile *p) {
     if (p) { json_object_unref(p->obj); g_free(p); }
 }
+
 JsonObject *ss_node(SsProfile *p, guint proto) {
     return object_member(p->obj, proto == 0 ? "tcp" : "udp");
 }
+
 static gboolean node_validate(JsonObject *o, GError **error) {
     if (!o) return fail(error, _("Missing TCP or UDP node"));
     const char *server = ss_string(o, "server");
@@ -170,6 +181,7 @@ static gboolean node_validate(JsonObject *o, GError **error) {
         return fail(error, _("Specify a plugin executable before setting plugin options or arguments"));
     return TRUE;
 }
+
 static JsonObject *clean_node(JsonObject *node) {
     JsonObject *clean = json_object_new();
     const char *keys[] = {"server", "server_port", "method", "password", "plugin", "plugin_opts", "plugin_args", "plugin_mode", NULL};
@@ -178,6 +190,7 @@ static JsonObject *clean_node(JsonObject *node) {
             json_object_set_member(clean, keys[i], json_node_copy(json_object_get_member(node, keys[i])));
     return clean;
 }
+
 static gboolean cidrs_validate(JsonArray *array, GError **error) {
     if (!array || json_array_get_length(array) > 100000)
         return fail(error, _("Invalid CIDR list or more than 100000 entries"));
@@ -192,10 +205,12 @@ static gboolean cidrs_validate(JsonArray *array, GError **error) {
     }
     return TRUE;
 }
+
 gboolean ss_enabled(SsProfile *p, guint family) {
     const char *mode = ss_string(p->obj, "ip_mode");
     return !strcmp(mode, "dual") || !strcmp(mode, family == 4 ? "ipv4" : "ipv6");
 }
+
 gboolean ss_profile_validate(SsProfile *p, GError **error) {
     if (!node_validate(ss_node(p, 0), error) || !node_validate(ss_node(p, 1), error)) return FALSE;
     const char *name = ss_string(p->obj, "name");
@@ -234,6 +249,7 @@ gboolean ss_profile_validate(SsProfile *p, GError **error) {
     }
     return TRUE;
 }
+
 SsProfile *ss_profile_parse(const char *text, GError **error) {
     JsonObject *o = parse_object(text, error);
     if (!o) return NULL;
@@ -252,10 +268,12 @@ SsProfile *ss_profile_parse(const char *text, GError **error) {
     }
     return p;
 }
+
 SsProfile *ss_profile_load(const char *path, GError **error) {
     g_autofree char *text = read_bounded(path, error);
     return text ? ss_profile_parse(text, error) : NULL;
 }
+
 char *ss_profile_json(SsProfile *p, gboolean secrets) {
     JsonObject *o = copy_object(p->obj);
     if (!secrets) for (guint i = 0; i < 2; i++) {
@@ -268,6 +286,7 @@ char *ss_profile_json(SsProfile *p, gboolean secrets) {
     json_object_unref(o);
     return text;
 }
+
 JsonObject *ss_import_node(const char *path, guint index, GError **error) {
     g_autofree char *text = read_bounded(path, error);
     if (!text) return NULL;
@@ -300,6 +319,7 @@ JsonObject *ss_import_node(const char *path, guint index, GError **error) {
     json_object_unref(result);
     return clean;
 }
+
 JsonArray *ss_cidrs_load(const char *path, GError **error) {
     g_autofree char *text = read_bounded(path, error);
     if (!text) return NULL;
@@ -314,6 +334,7 @@ JsonArray *ss_cidrs_load(const char *path, GError **error) {
     if (!cidrs_validate(array, error)) { json_array_unref(array); return NULL; }
     return array;
 }
+
 gboolean ss_profile_export(SsProfile *p, const char *path, GError **error) {
     g_autofree char *text = ss_profile_json(p, TRUE);
     int fd = open(path, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
@@ -322,12 +343,23 @@ gboolean ss_profile_export(SsProfile *p, const char *path, GError **error) {
     while (written < len) {
         ssize_t n = write(fd, text + written, len - written);
         if (n < 0 && errno == EINTR) continue;
-        if (n <= 0) { int saved = errno; close(fd); unlink(path); g_set_error(error, G_IO_ERROR, g_io_error_from_errno(saved), _("Cannot write configuration file")); return FALSE; }
+        if (n <= 0) {
+            int saved = errno;
+            close(fd); unlink(path);
+            g_set_error(error, G_IO_ERROR, g_io_error_from_errno(saved), _("Cannot write configuration file"));
+            return FALSE;
+        }
         written += n;
     }
-    if (close(fd) != 0) { fail(error, _("Cannot close configuration file")); return FALSE; }
+    
+    if (close(fd) != 0) {
+        fail(error, _("Cannot close configuration file"));
+        return FALSE;
+    }
+    
     return TRUE;
 }
+
 gboolean ss_connection_update(SsProfile *p, NMConnection *conn, GError **error) {
     if (!ss_profile_validate(p, error)) return FALSE;
     NMSettingVpn *vpn = NM_SETTING_VPN(nm_setting_vpn_new());
@@ -343,6 +375,7 @@ gboolean ss_connection_update(SsProfile *p, NMConnection *conn, GError **error) 
     nm_connection_add_setting(conn, NM_SETTING(vpn));
     return TRUE;
 }
+
 NMConnection *ss_connection_new(SsProfile *p, GError **error) {
     NMConnection *conn = nm_simple_connection_new();
     NMSetting *meta = nm_setting_connection_new();
@@ -362,6 +395,7 @@ NMConnection *ss_connection_new(SsProfile *p, GError **error) {
     if (!nm_connection_verify(conn, error)) { g_object_unref(conn); return NULL; }
     return conn;
 }
+
 SsProfile *ss_profile_from_connection(NMConnection *conn, gboolean require, GError **error) {
     NMSettingVpn *vpn = nm_connection_get_setting_vpn(conn);
     if (!vpn || g_strcmp0(nm_setting_vpn_get_service_type(vpn), SS_SERVICE)) {
@@ -401,6 +435,7 @@ SsProfile *ss_profile_from_connection(NMConnection *conn, gboolean require, GErr
     }
     return p;
 }
+
 char *ss_backend_json(SsProfile *p) {
     JsonObject *o = json_object_new();
     JsonArray *servers = json_array_new();

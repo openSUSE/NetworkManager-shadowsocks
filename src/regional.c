@@ -26,6 +26,7 @@ static gboolean invalid(GError **error, const char *detail) {
     g_set_error(error, G_IO_ERROR, G_IO_ERROR_INVALID_DATA, _("Invalid APNIC data: %s"), detail);
     return FALSE;
 }
+
 JsonArray *ss_regional_default(char **source, GError **error) {
     g_autofree char *user = g_build_filename(g_get_user_data_dir(), "NetworkManager-shadowsocks", "china", "china.cidr", NULL);
     const char *paths[] = {user, SS_REGIONAL_STATE "/china.cidr", SS_REGIONAL_BUNDLED "/china.cidr"};
@@ -45,6 +46,7 @@ JsonArray *ss_regional_default(char **source, GError **error) {
     g_set_error_literal(error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("Default China dataset not found; install the data files or run nm-shadowsocks-update-routes"));
     return NULL;
 }
+
 gboolean ss_profile_use_default_regional(SsProfile *p, GError **error) {
     JsonNode *n = json_object_get_member(p->obj, "china");
     if (strcmp(ss_string(p->obj, "mode"), "china") || !n || !JSON_NODE_HOLDS_ARRAY(n) ||

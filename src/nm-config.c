@@ -28,6 +28,7 @@ static guint32 ip4_number(const char *address) {
     inet_pton(AF_INET, address, &ip);
     return ip.s_addr;
 }
+
 GVariant *ss_ip_config(SsProfile *p, guint family) {
     GVariantBuilder ip, dns, domains;
     g_variant_builder_init(&ip, G_VARIANT_TYPE_VARDICT);
