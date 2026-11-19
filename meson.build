@@ -14,6 +14,8 @@ conf.set_quoted('GETTEXT_PACKAGE', 'NetworkManager-shadowsocks')
 conf.set_quoted('SS_LOCALEDIR', get_option('prefix') / get_option('localedir'))
 conf.set_quoted('SS_IP', get_option('ip_binary'))
 conf.set_quoted('SS_LOCAL', get_option('sslocal_binary'))
+conf.set_quoted('SS_BACKEND_USER', get_option('service_user'))
+conf.set_quoted('SS_SETPRIV', get_option('setpriv_binary'))
 conf.set_quoted('SS_REGIONAL_BUNDLED', get_option('prefix') / get_option('datadir') / 'NetworkManager-shadowsocks/china')
 conf.set_quoted('SS_REGIONAL_STATE', get_option('prefix') / get_option('localstatedir') / 'lib/NetworkManager-shadowsocks/china')
 configure_file(output: 'config.h', configuration: conf)
@@ -33,8 +35,11 @@ foreach locale_case : [['english', 'C.UTF-8', 'en', 'english'],
 endforeach
 test('translation-format-check', find_program('msgfmt'),
   args: ['--check', '--check-format', '-o', '/dev/null', meson.project_source_root() / 'po/zh_CN.po'])
-executable('nm-shadowsocks-service', ['src/service.c', 'src/runtime.c'],
+executable('nm-shadowsocks-service', ['src/service.c', 'src/runtime.c', 'src/backend.c'],
   dependencies: coredep, install: true, install_dir: get_option('libexecdir'))
+privilege_test = executable('test-backend-privileges', ['tests/test-backend-privileges.c', 'src/backend.c'],
+  dependencies: coredep)
+test('backend-privileges', privilege_test)
 editor = shared_module('nm-vpn-plugin-shadowsocks', 'src/editor-plugin.c',
   dependencies: [coredep, gmodule, meson.get_compiler('c').find_library('dl')],
   install: true, install_dir: get_option('libdir') / 'NetworkManager')
@@ -89,7 +94,6 @@ configure_file(input: 'data/nm-shadowsocks-service.name.in', output: 'nm-shadows
 install_data('data/org.freedesktop.NetworkManager.shadowsocks.conf',
   install_dir: get_option('datadir') / 'dbus-1/system.d')
 install_data('examples/profile.json', 'examples/regional-example.cidr', install_dir: get_option('datadir') / 'doc/NetworkManager-shadowsocks/examples')
-install_data('README.md', 'README-zh_CN.md', 'DESIGN.md', install_dir: get_option('datadir') / 'doc/NetworkManager-shadowsocks')
 install_data('data/china/china.cidr', 'data/china/china-ipv4.cidr', 'data/china/china-ipv6.cidr',
   'data/china/china.json', 'data/china/README.md', install_dir: get_option('datadir') / 'NetworkManager-shadowsocks/china')
 

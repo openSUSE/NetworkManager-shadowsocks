@@ -21,7 +21,7 @@ flowchart LR
 ## 路由与 DNS 生命周期
 
 1. 以不可跟随符号链接的 root 锁排他运行，检查保留路由表、优先级和接口名空闲。
-2. 在原网络解析节点域名，只向后端写入白名单节点字段、协议限制和固定 TUN 参数；启动一个 sslocal。
+2. 在原网络解析节点域名，只向后端写入白名单节点字段、协议限制和固定 TUN 参数；通过 setpriv 以 shadowsocks 系统账户启动一个 sslocal，清除附加组，仅保留 CAP_NET_ADMIN 并设置 no_new_privs；混淆插件继承同一身份及能力。配置目录及文件仍由 root 持有，后端组只读。账户缺失或降权失败时不以 root 重试。
 3. TUN 使用 `198.18.0.1/30` 和 `fd53:5353::1/126`。调整临时接口 MTU 和 rp_filter，不更改全局 sysctl。
 4. 两个地址族的路由表全部建立后再安装策略规则。未启用地址族在协议表中使用 unreachable default。例外 throw 回落到 main。
 5. libnm 直接发布用户指定的上游 DNS 地址，按 IPv4/IPv6 分组；不创建 DNS 监听器或转发进程。DNS 地址的主机路由强制进入 TUN。
@@ -75,3 +75,13 @@ Meson 的 GLib 单元测试覆盖 JSON 类型、独立节点、共用回退、�
 参考：[libnm VPN 服务](https://networkmanager.dev/docs/libnm/latest/NMVpnServicePlugin.html)、[shadowsocks-rust](https://github.com/shadowsocks/shadowsocks-rust)、[Linux 策略路由](https://man7.org/linux/man-pages/man8/ip-rule.8.html)。
 
 SIP003 节点字段在白名单清洗后保留，`plugin_opts` 和 `plugin_args` 随连接配置保存，避免宿主未加载 secrets 时编辑器丢失字段；兼容读取旧版 VPN secrets，配置中的值优先；GTK 3/4 同时提供编辑与导入。`plugin.c` 在激活时校验系统插件和管理员注册的额外程序，解析为可信绝对路径。运行时预解析服务器后重建路由计划，为插件端点添加双协议直连地址；独立 session 拥有后端及插件子进程，停止时整体清理。
+
+降权测试 `test-backend-privileges` 验证后端及模拟插件子进程的 UID/GID、能力集合、不可恢复 root、配置只读和 SO_MARK。可在具有完整 subordinate UID/GID 映射的隔离环境运行：
+
+```sh
+unshare --user --map-root-user --map-auto --net build/test-backend-privileges --tun
+```
+
+`--tun` 还会启动真实 sslocal 验证 TUN 创建；该测试需已安装后端和系统账户，且仅应在独立网络命名空间运行。普通非 root 构建会跳过降权测试。
+
+降权回归测试会先移除 CAP_CHOWN 和 CAP_SETPCAP 并重新执行，以模拟 NetworkManager 的 capability 限制。配置属组在 fork 后的子进程中切换有效 GID 后设置，避免依赖 CAP_CHOWN；不修改继承的 bounding set，执行后的 permitted/effective/inheritable/ambient 集合仅含 CAP_NET_ADMIN，并由 no_new_privs 阻止通过可执行文件获得额外权限。

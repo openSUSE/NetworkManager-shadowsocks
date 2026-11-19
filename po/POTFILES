@@ -9,3 +9,4 @@ src/runtime.c
 src/service.c
 tools/update-routes.py
 src/auth-dialog.c
+src/backend.c

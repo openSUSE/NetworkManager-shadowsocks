@@ -20,6 +20,7 @@
 
 
 #include "ss.h"
+#include "backend.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <net/if.h>
@@ -62,11 +63,6 @@ static gboolean write_secret(const char *path, const char *text, GError **error)
     g_autoptr(GFile) file = g_file_new_for_path(path);
     return g_file_replace_contents(file, text, strlen(text), NULL, FALSE,
         G_FILE_CREATE_PRIVATE, NULL, NULL, error);
-}
-
-static void backend_session(gpointer data) {
-    (void) data;
-    if (setsid() < 0) _exit(127);
 }
 
 gboolean ss_runtime_start(SsRuntime *r, GCancellable *cancel, GError **error) {
@@ -129,10 +125,7 @@ gboolean ss_runtime_start(SsRuntime *r, GCancellable *cancel, GError **error) {
     if (!write_secret(path, config, error)) return FALSE;
     /* Keep backend diagnostics in the service journal. Silencing output hides
      * relay, plugin and DNS failures after NetworkManager reports connected. */
-    g_autoptr(GSubprocessLauncher) launcher = g_subprocess_launcher_new(
-        G_SUBPROCESS_FLAGS_NONE);
-    g_subprocess_launcher_set_child_setup(launcher, backend_session, NULL, NULL);
-    r->child = g_subprocess_launcher_spawn(launcher, error, SS_LOCAL, "-c", path, NULL);
+    r->child = ss_backend_spawn(SS_LOCAL, path, error);
     if (!r->child) return FALSE;
     r->backend_group = (pid_t) g_ascii_strtoll(g_subprocess_get_identifier(r->child), NULL, 10);
     gint64 deadline = g_get_monotonic_time() + 10 * G_TIME_SPAN_SECOND;

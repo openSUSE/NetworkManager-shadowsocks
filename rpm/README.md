@@ -46,3 +46,7 @@ SVG loader explicitly; on current Tumbleweed this capability is provided by
 The backend package must provide an `sslocal` binary built with `local-tun`.
 After package installation, let NetworkManager rediscover VPN plugins at a
 convenient time; this package deliberately does not interrupt active networking.
+
+The backend uses the existing `shadowsocks` account supplied by the Shadowsocks
+package. The service requires util-linux `setpriv` to drop the backend and plugin
+UID/GID while retaining only `CAP_NET_ADMIN` for TUN and socket marks.

@@ -734,3 +734,13 @@ msgstr "TCP 节点密码"
 #: src/auth-dialog.c
 msgid "UDP node password"
 msgstr "UDP 节点密码"
+
+#: src/backend.c
+#, c-format
+msgid "Backend account '%s' must exist and have a non-root UID and GID"
+msgstr "后端账户“%s”必须存在，且 UID 和 GID 均不能为 root"
+
+#: src/backend.c
+#, c-format
+msgid "Cannot grant the backend access to its configuration: %s"
+msgstr "无法授予后端读取配置的权限：%s"

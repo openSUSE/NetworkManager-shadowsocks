@@ -727,3 +727,13 @@ msgstr ""
 #: src/auth-dialog.c
 msgid "UDP node password"
 msgstr ""
+
+#: src/backend.c
+#, c-format
+msgid "Backend account '%s' must exist and have a non-root UID and GID"
+msgstr ""
+
+#: src/backend.c
+#, c-format
+msgid "Cannot grant the backend access to its configuration: %s"
+msgstr ""

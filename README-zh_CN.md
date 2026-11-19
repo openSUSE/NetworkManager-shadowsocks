@@ -99,11 +99,13 @@ nm-shadowsocks import --tcp node.json --mode lan --bypass-cidrs ./regional-route
 
 ## 行为与边界
 
+NetworkManager 服务以 root 身份管理路由，通过 util-linux 的 `setpriv` 以已有的 `shadowsocks` 系统账户启动 `sslocal` 和 SIP003 插件，清除附加组，仅保留 TUN 和流量标记所需的 `CAP_NET_ADMIN`；插件也会继承此能力。禁止通过 setuid 程序或文件能力提升权限。账户不存在或降权失败时拒绝启动，不回退到 root。openSUSE 的 Shadowsocks 包提供该账户；其他发行版需预先创建，或在构建时通过 `-Dservice_user=NAME` 指定已有的非 root 账户。
+
 - 代理本机 TCP/UDP 流量，包含 UDP/QUIC；这不是路由器/网关配置工具。不自动开启转发，不更改防火墙，不代理原始 ICMP 等协议，不能用 ping 判断节点可用性。
 - “全局”仍保留 loopback、链路本地、多播等系统必要地址；“局域网”额外排除私网和 CGNAT；“区域”再排除所选区域 CIDR（默认为中国大陆 IP）。
 - 节点域名在建立路由前使用原网络解析，后端配置固定解析结果；节点 IP 变化或原网络变化后请重连。底层传输地址族取决于节点和物理网络，与代理目标地址族独立。
 - DNS 地址直接通过 NetworkManager 发布，优先级为 -5353、路由域为 `~.`。不启动本地 DNS 转发器，也不监听本地 53 端口。一个 TUN 同时接收 TCP/UDP，后端的两条服务器记录分别限制为 `tcp_only` / `udp_only`，系统解析器绑定 VPN 接口时也能选用对应节点。应用内置 DoH 仍按普通 TCP/UDP 规则处理，不能由此强制应用使用所配置 DNS。
-- 密码保存为 NetworkManager VPN secrets（系统持有，支持无人值守），不写入 `vpn.data`；运行时配置置于 `/run` 的 0700 目录、0600 文件中。导出文件含密码，拒绝覆盖现有文件或符号链接。提供 GNOME VPN 认证辅助程序，接收 NetworkManager 传入的已保存密码；需要交互时由 GNOME Shell 显示密码对话框。
+- 密码保存为 NetworkManager VPN secrets（系统持有，支持无人值守），不写入 `vpn.data`；运行时配置位于 `/run`，目录和文件仍由 root 持有，权限分别为 0710 和 0640，仅允许后端组读取而不能修改。导出文件含密码，拒绝覆盖现有文件或符号链接。提供 GNOME VPN 认证辅助程序，接收 NetworkManager 传入的已保存密码；需要交互时由 GNOME Shell 显示密码对话框。
 - 仅支持所列 AEAD / Shadowsocks 2022 加密方式。暂不支持 `ss://`、订阅下载、JSON5。导入时不会继承文件里的监听器或 ACL。
 - 同时只能激活一个本插件连接。保留接口名 `nmss-tun`、路由表 51820/51821、规则优先级 10500/10501/10502/10503/10510/10511、SO_MARK 0x5353；占用时拒绝连接。自定义策略路由/其他 VPN 若有更高优先级规则，可能改变实际路径，需管理员协调。
 - 正常断开、启动失败和 SIGTERM 会回滚路由并终止后端。**无持久 kill switch**，断开后恢复原网络；服务 SIGKILL/崩溃的残留策略需管理员清理，参见 DESIGN.md。启动成功表示本地通道建立，不代表远端密码或网络可用性已验证。
