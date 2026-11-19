@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "i18n.h"
 #include <locale.h>
 

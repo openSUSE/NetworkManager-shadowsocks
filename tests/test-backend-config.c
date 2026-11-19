@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "ss.h"
 
 int main(int argc, char **argv) {

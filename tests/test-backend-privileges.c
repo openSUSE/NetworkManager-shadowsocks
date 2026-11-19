@@ -56,8 +56,8 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[1], "-c")) {
             /* A SIP003-style descendant must inherit the same non-root identity. */
             g_autoptr(GError) error = NULL;
-            g_autoptr(GSubprocess) child = g_subprocess_new(G_SUBPROCESS_FLAGS_NONE,
-                &error, argv[0], "--plugin", argv[2], NULL);
+            g_autoptr(GSubprocess) child = g_subprocess_new(G_SUBPROCESS_FLAGS_NONE, &error,
+                                                            argv[0], "--plugin", argv[2], NULL);
             g_assert_no_error(error);
             g_assert_true(g_subprocess_wait_check(child, NULL, &error));
             g_assert_no_error(error);
@@ -88,10 +88,11 @@ int main(int argc, char **argv) {
     gboolean passed = g_subprocess_wait_check(child, NULL, &error);
     if (passed && argc == 2 && !strcmp(argv[1], "--tun")) {
         /* Explicit opt-in: run only inside a private network namespace. */
-        g_autoptr(SsProfile) profile = ss_profile_parse(
-            "{\"ip_mode\":\"ipv4\",\"dns\":[\"1.1.1.1\"],\"tcp\":{"
-            "\"server\":\"127.0.0.1\",\"server_port\":8388,"
-            "\"method\":\"aes-256-gcm\",\"password\":\"test\"}}", &error);
+        g_autoptr(SsProfile) profile =
+            ss_profile_parse("{\"ip_mode\":\"ipv4\",\"dns\":[\"1.1.1.1\"],\"tcp\":{"
+                             "\"server\":\"127.0.0.1\",\"server_port\":8388,"
+                             "\"method\":\"aes-256-gcm\",\"password\":\"test\"}}",
+                             &error);
         g_assert_no_error(error);
         g_autofree char *config = ss_backend_json(profile);
         g_assert_true(g_file_set_contents(path, config, -1, &error));
@@ -102,7 +103,7 @@ int main(int argc, char **argv) {
         while (!if_nametoindex("nmss-tun") && g_get_monotonic_time() < deadline)
             g_usleep(50000);
         gboolean tun_ready = if_nametoindex("nmss-tun") != 0;
-        kill(-(pid_t) g_ascii_strtoll(g_subprocess_get_identifier(backend), NULL, 10), SIGKILL);
+        kill(-(pid_t)g_ascii_strtoll(g_subprocess_get_identifier(backend), NULL, 10), SIGKILL);
         g_subprocess_wait(backend, NULL, NULL);
         unlink(path);
         rmdir(dir);

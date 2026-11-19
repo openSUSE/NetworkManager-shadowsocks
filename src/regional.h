@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #pragma once
 #include "ss.h"
 /* The default dataset is mainland China. Legacy profile keys and on-disk

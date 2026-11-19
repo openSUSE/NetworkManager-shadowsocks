@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #pragma once
 
 #include <gtk/gtk.h>
@@ -40,10 +39,10 @@ static inline void gtk_container_set_border_width(GtkWidget *widget, guint borde
     gtk_widget_set_margin_bottom(widget, border);
 }
 
-static inline void gtk_box_pack_start(GtkBox *box, GtkWidget *child,
-                                      gboolean expand, gboolean fill, guint padding) {
-    (void) fill;
-    (void) padding;
+static inline void gtk_box_pack_start(GtkBox *box, GtkWidget *child, gboolean expand, gboolean fill,
+                                      guint padding) {
+    (void)fill;
+    (void)padding;
     gtk_widget_set_vexpand(child, expand);
     gtk_box_append(box, child);
 }

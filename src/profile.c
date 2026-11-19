@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "ss.h"
 #include "regional.h"
 #include <errno.h>
@@ -35,7 +34,8 @@ static gboolean fail(GError **error, const char *message) {
 const char *ss_string(JsonObject *o, const char *key) {
     JsonNode *n = o ? json_object_get_member(o, key) : NULL;
     return n && JSON_NODE_HOLDS_VALUE(n) && json_node_get_value_type(n) == G_TYPE_STRING
-        ? json_node_get_string(n) : "";
+               ? json_node_get_string(n)
+               : "";
 }
 
 static JsonObject *object_member(JsonObject *o, const char *key) {
@@ -82,7 +82,8 @@ static JsonObject *parse_object(const char *text, GError **error) {
 static char *read_bounded(const char *path, GError **error) {
     g_autoptr(GFile) file = g_file_new_for_path(path);
     g_autoptr(GFileInputStream) stream = g_file_read(file, NULL, error);
-    if (!stream) return NULL;
+    if (!stream)
+        return NULL;
     GString *text = g_string_new(NULL);
     char buf[8192];
     gssize n;
@@ -95,7 +96,8 @@ static char *read_bounded(const char *path, GError **error) {
         g_string_append_len(text, buf, n);
     }
     if (n < 0 || memchr(text->str, '\0', text->len)) {
-        if (n >= 0) fail(error, _("File contains NUL bytes"));
+        if (n >= 0)
+            fail(error, _("File contains NUL bytes"));
         g_string_free(text, TRUE);
         return NULL;
     }
@@ -118,7 +120,10 @@ SsProfile *ss_profile_new(void) {
 }
 
 void ss_profile_free(SsProfile *p) {
-    if (p) { json_object_unref(p->obj); g_free(p); }
+    if (p) {
+        json_object_unref(p->obj);
+        g_free(p);
+    }
 }
 
 JsonObject *ss_node(SsProfile *p, guint proto) {
@@ -126,12 +131,18 @@ JsonObject *ss_node(SsProfile *p, guint proto) {
 }
 
 static gboolean node_validate(JsonObject *o, GError **error) {
-    if (!o) return fail(error, _("Missing TCP or UDP node"));
+    if (!o)
+        return fail(error, _("Missing TCP or UDP node"));
     const char *server = ss_string(o, "server");
     const char *method = ss_string(o, "method");
     const char *password = ss_string(o, "password");
-    const char *methods[] = {"aes-128-gcm", "aes-256-gcm", "chacha20-ietf-poly1305",
-        "2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305", NULL};
+    const char *methods[] = {"aes-128-gcm",
+                             "aes-256-gcm",
+                             "chacha20-ietf-poly1305",
+                             "2022-blake3-aes-128-gcm",
+                             "2022-blake3-aes-256-gcm",
+                             "2022-blake3-chacha20-poly1305",
+                             NULL};
     if (!*server || strlen(server) > 253)
         return fail(error, _("Server address must contain 1-253 characters"));
     g_autoptr(GInetAddress) ip = g_inet_address_new_from_string(server);
@@ -139,18 +150,22 @@ static gboolean node_validate(JsonObject *o, GError **error) {
         for (const char *c = server; *c; c++)
             if (!g_ascii_isalnum(*c) && *c != '-' && *c != '.')
                 return fail(error, _("Server must be an IP address or an ASCII DNS hostname"));
-        if (!g_ascii_isalnum(*server)) return fail(error, _("Hostname must start with a letter or digit"));
+        if (!g_ascii_isalnum(*server))
+            return fail(error, _("Hostname must start with a letter or digit"));
     }
     JsonNode *port = json_object_get_member(o, "server_port");
-    if (!port || json_node_get_value_type(port) != G_TYPE_INT64 ||
-        json_node_get_int(port) < 1 || json_node_get_int(port) > 65535)
+    if (!port || json_node_get_value_type(port) != G_TYPE_INT64 || json_node_get_int(port) < 1 ||
+        json_node_get_int(port) > 65535)
         return fail(error, _("Port must be an integer between 1 and 65535"));
-    if (!g_strv_contains(methods, method)) return fail(error, _("Unsupported cipher; use an AEAD node"));
-    if (!*password || strlen(password) > 4096) return fail(error, _("Node password must not be empty or exceed 4096 bytes"));
+    if (!g_strv_contains(methods, method))
+        return fail(error, _("Unsupported cipher; use an AEAD node"));
+    if (!*password || strlen(password) > 4096)
+        return fail(error, _("Node password must not be empty or exceed 4096 bytes"));
     const char *strings[] = {"plugin", "plugin_opts", "plugin_mode", NULL};
     for (guint i = 0; strings[i]; i++) {
         JsonNode *value = json_object_get_member(o, strings[i]);
-        if (value && (!JSON_NODE_HOLDS_VALUE(value) || json_node_get_value_type(value) != G_TYPE_STRING))
+        if (value &&
+            (!JSON_NODE_HOLDS_VALUE(value) || json_node_get_value_type(value) != G_TYPE_STRING))
             return fail(error, _("Plugin name, options and mode must be strings"));
     }
     const char *plugin = ss_string(o, "plugin");
@@ -158,11 +173,15 @@ static gboolean node_validate(JsonObject *o, GError **error) {
         return fail(error, _("Plugin name or options are too long"));
     for (const char *c = plugin; *c; c++)
         if (!g_ascii_isalnum(*c) && !strchr("/-_.+", *c))
-            return fail(error, _("Plugin must be an executable name or an absolute path, without arguments"));
+            return fail(
+                error,
+                _("Plugin must be an executable name or an absolute path, without arguments"));
     if (*plugin && (plugin[0] == '-' || (!g_path_is_absolute(plugin) && strchr(plugin, '/'))))
-        return fail(error, _("Plugin must be an executable name or an absolute path, without arguments"));
+        return fail(error,
+                    _("Plugin must be an executable name or an absolute path, without arguments"));
     const char *modes[] = {"tcp_only", "udp_only", "tcp_and_udp", NULL};
-    if (json_object_has_member(o, "plugin_mode") && !g_strv_contains(modes, ss_string(o, "plugin_mode")))
+    if (json_object_has_member(o, "plugin_mode") &&
+        !g_strv_contains(modes, ss_string(o, "plugin_mode")))
         return fail(error, _("Invalid plugin mode"));
     JsonNode *args = json_object_get_member(o, "plugin_args");
     if (args) {
@@ -177,17 +196,20 @@ static gboolean node_validate(JsonObject *o, GError **error) {
         }
     }
     if (!*plugin && (*ss_string(o, "plugin_opts") ||
-        (args && json_array_get_length(json_node_get_array(args)))))
-        return fail(error, _("Specify a plugin executable before setting plugin options or arguments"));
+                     (args && json_array_get_length(json_node_get_array(args)))))
+        return fail(error,
+                    _("Specify a plugin executable before setting plugin options or arguments"));
     return TRUE;
 }
 
 static JsonObject *clean_node(JsonObject *node) {
     JsonObject *clean = json_object_new();
-    const char *keys[] = {"server", "server_port", "method", "password", "plugin", "plugin_opts", "plugin_args", "plugin_mode", NULL};
+    const char *keys[] = {"server",      "server_port", "method",      "password", "plugin",
+                          "plugin_opts", "plugin_args", "plugin_mode", NULL};
     for (guint i = 0; keys[i]; i++)
         if (json_object_has_member(node, keys[i]))
-            json_object_set_member(clean, keys[i], json_node_copy(json_object_get_member(node, keys[i])));
+            json_object_set_member(clean, keys[i],
+                                   json_node_copy(json_object_get_member(node, keys[i])));
     return clean;
 }
 
@@ -196,12 +218,16 @@ static gboolean cidrs_validate(JsonArray *array, GError **error) {
         return fail(error, _("Invalid CIDR list or more than 100000 entries"));
     for (guint i = 0; i < json_array_get_length(array); i++) {
         JsonNode *n = json_array_get_element(array, i);
-        if (json_node_get_value_type(n) != G_TYPE_STRING) return fail(error, _("CIDR entries must be strings"));
+        if (json_node_get_value_type(n) != G_TYPE_STRING)
+            return fail(error, _("CIDR entries must be strings"));
         const char *cidr = json_node_get_string(n);
-        if (!strchr(cidr, '/')) return fail(error, _("CIDR entries must include a prefix length"));
+        if (!strchr(cidr, '/'))
+            return fail(error, _("CIDR entries must include a prefix length"));
         g_autoptr(GInetAddressMask) mask = g_inet_address_mask_new_from_string(cidr, error);
-        if (!mask) return FALSE;
-        if (g_inet_address_mask_get_length(mask) == 0) return fail(error, _("Bypass ranges must not include a /0 default route"));
+        if (!mask)
+            return FALSE;
+        if (g_inet_address_mask_get_length(mask) == 0)
+            return fail(error, _("Bypass ranges must not include a /0 default route"));
     }
     return TRUE;
 }
@@ -212,37 +238,49 @@ gboolean ss_enabled(SsProfile *p, guint family) {
 }
 
 gboolean ss_profile_validate(SsProfile *p, GError **error) {
-    if (!node_validate(ss_node(p, 0), error) || !node_validate(ss_node(p, 1), error)) return FALSE;
+    if (!node_validate(ss_node(p, 0), error) || !node_validate(ss_node(p, 1), error))
+        return FALSE;
     const char *name = ss_string(p->obj, "name");
-    if (!*name || strlen(name) > 128) return fail(error, _("Connection name must contain 1-128 bytes"));
+    if (!*name || strlen(name) > 128)
+        return fail(error, _("Connection name must contain 1-128 bytes"));
     const char *modes[] = {"global", "lan", "china", NULL};
     const char *ip_modes[] = {"ipv4", "ipv6", "dual", NULL};
     if (!g_strv_contains(modes, ss_string(p->obj, "mode")) ||
-        !g_strv_contains(ip_modes, ss_string(p->obj, "ip_mode"))) return fail(error, _("Invalid proxy mode or IP mode"));
+        !g_strv_contains(ip_modes, ss_string(p->obj, "ip_mode")))
+        return fail(error, _("Invalid proxy mode or IP mode"));
     JsonArray *dns = array_member(p->obj, "dns");
     if (!dns || !json_array_get_length(dns) || json_array_get_length(dns) > 8)
         return fail(error, _("Specify 1-8 DNS IP addresses"));
     for (guint i = 0; i < json_array_get_length(dns); i++) {
         JsonNode *n = json_array_get_element(dns, i);
-        if (json_node_get_value_type(n) != G_TYPE_STRING) return fail(error, _("DNS addresses must be IP address strings"));
+        if (json_node_get_value_type(n) != G_TYPE_STRING)
+            return fail(error, _("DNS addresses must be IP address strings"));
         g_autoptr(GInetAddress) ip = g_inet_address_new_from_string(json_node_get_string(n));
         if (!ip || g_inet_address_get_is_loopback(ip) || g_inet_address_get_is_any(ip) ||
             g_inet_address_get_is_multicast(ip) || g_inet_address_get_is_link_local(ip))
-            return fail(error, _("DNS must be a unicast IP reachable through the proxy, not a local stub"));
+            return fail(
+                error, _("DNS must be a unicast IP reachable through the proxy, not a local stub"));
         g_autoptr(GInetAddressMask) reserved = g_inet_address_mask_new_from_string(
-            g_inet_address_get_family(ip) == G_SOCKET_FAMILY_IPV4 ? "198.18.0.0/29" : "fd53:5353::/125", NULL);
+            g_inet_address_get_family(ip) == G_SOCKET_FAMILY_IPV4 ? "198.18.0.0/29"
+                                                                  : "fd53:5353::/125",
+            NULL);
         if (g_inet_address_mask_matches(reserved, ip))
             return fail(error, _("Upstream DNS must not use the internal TUN addresses"));
         if (!ss_enabled(p, g_inet_address_get_family(ip) == G_SOCKET_FAMILY_IPV4 ? 4 : 6))
             return fail(error, _("DNS address family does not match the IP mode"));
     }
     JsonArray *regional = array_member(p->obj, "china");
-    if (!cidrs_validate(regional, error) || !cidrs_validate(array_member(p->obj, "bypass"), error)) return FALSE;
+    if (!cidrs_validate(regional, error) || !cidrs_validate(array_member(p->obj, "bypass"), error))
+        return FALSE;
     if (!strcmp(ss_string(p->obj, "mode"), "china")) {
         gboolean has4 = FALSE, has6 = FALSE;
         for (guint i = 0; i < json_array_get_length(regional); i++) {
-            g_autoptr(GInetAddressMask) mask = g_inet_address_mask_new_from_string(json_array_get_string_element(regional, i), NULL);
-            if (g_inet_address_mask_get_family(mask) == G_SOCKET_FAMILY_IPV4) has4 = TRUE; else has6 = TRUE;
+            g_autoptr(GInetAddressMask) mask = g_inet_address_mask_new_from_string(
+                json_array_get_string_element(regional, i), NULL);
+            if (g_inet_address_mask_get_family(mask) == G_SOCKET_FAMILY_IPV4)
+                has4 = TRUE;
+            else
+                has6 = TRUE;
         }
         if ((ss_enabled(p, 4) && !has4) || (ss_enabled(p, 6) && !has6))
             return fail(error, _("Regional CIDRs must cover each enabled address family"));
@@ -252,16 +290,21 @@ gboolean ss_profile_validate(SsProfile *p, GError **error) {
 
 SsProfile *ss_profile_parse(const char *text, GError **error) {
     JsonObject *o = parse_object(text, error);
-    if (!o) return NULL;
+    if (!o)
+        return NULL;
     SsProfile *p = ss_profile_new();
     const char *keys[] = {"name", "tcp", "udp", "mode", "ip_mode", "dns", "china", "bypass", NULL};
     for (guint i = 0; keys[i]; i++)
         if (json_object_has_member(o, keys[i]))
-            json_object_set_member(p->obj, keys[i], json_node_copy(json_object_get_member(o, keys[i])));
+            json_object_set_member(p->obj, keys[i],
+                                   json_node_copy(json_object_get_member(o, keys[i])));
     json_object_unref(o);
     if (!json_object_has_member(p->obj, "udp") && ss_node(p, 0))
         json_object_set_object_member(p->obj, "udp", copy_object(ss_node(p, 0)));
-    if (!ss_profile_use_default_regional(p, error) || !ss_profile_validate(p, error)) { ss_profile_free(p); return NULL; }
+    if (!ss_profile_use_default_regional(p, error) || !ss_profile_validate(p, error)) {
+        ss_profile_free(p);
+        return NULL;
+    }
     for (guint i = 0; i < 2; i++) {
         JsonObject *clean = clean_node(ss_node(p, i));
         json_object_set_object_member(p->obj, i == 0 ? "tcp" : "udp", clean);
@@ -276,12 +319,13 @@ SsProfile *ss_profile_load(const char *path, GError **error) {
 
 char *ss_profile_json(SsProfile *p, gboolean secrets) {
     JsonObject *o = copy_object(p->obj);
-    if (!secrets) for (guint i = 0; i < 2; i++) {
-        JsonObject *n = object_member(o, i == 0 ? "tcp" : "udp");
-        if (n) {
-            json_object_remove_member(n, "password");
+    if (!secrets)
+        for (guint i = 0; i < 2; i++) {
+            JsonObject *n = object_member(o, i == 0 ? "tcp" : "udp");
+            if (n) {
+                json_object_remove_member(n, "password");
+            }
         }
-    }
     char *text = serialize(o);
     json_object_unref(o);
     return text;
@@ -289,14 +333,18 @@ char *ss_profile_json(SsProfile *p, gboolean secrets) {
 
 JsonObject *ss_import_node(const char *path, guint index, GError **error) {
     g_autofree char *text = read_bounded(path, error);
-    if (!text) return NULL;
+    if (!text)
+        return NULL;
     JsonObject *root = parse_object(text, error);
-    if (!root) return NULL;
+    if (!root)
+        return NULL;
     JsonObject *source = root;
     JsonArray *nodes = array_member(root, "servers");
-    if (!nodes) nodes = array_member(root, "shadowsocks");
+    if (!nodes)
+        nodes = array_member(root, "shadowsocks");
     if (nodes) {
-        if (index >= json_array_get_length(nodes) || !JSON_NODE_HOLDS_OBJECT(json_array_get_element(nodes, index))) {
+        if (index >= json_array_get_length(nodes) ||
+            !JSON_NODE_HOLDS_OBJECT(json_array_get_element(nodes, index))) {
             fail(error, _("Node index is out of range; indexes start at 0"));
             json_object_unref(root);
             return NULL;
@@ -310,10 +358,15 @@ JsonObject *ss_import_node(const char *path, guint index, GError **error) {
     JsonObject *result = copy_object(source);
     json_object_unref(root);
     if (!json_object_has_member(result, "server") && json_object_has_member(result, "address"))
-        json_object_set_member(result, "server", json_node_copy(json_object_get_member(result, "address")));
+        json_object_set_member(result, "server",
+                               json_node_copy(json_object_get_member(result, "address")));
     if (!json_object_has_member(result, "server_port") && json_object_has_member(result, "port"))
-        json_object_set_member(result, "server_port", json_node_copy(json_object_get_member(result, "port")));
-    if (!node_validate(result, error)) { json_object_unref(result); return NULL; }
+        json_object_set_member(result, "server_port",
+                               json_node_copy(json_object_get_member(result, "port")));
+    if (!node_validate(result, error)) {
+        json_object_unref(result);
+        return NULL;
+    }
     /* Only allow node fields into the stored profile. */
     JsonObject *clean = clean_node(result);
     json_object_unref(result);
@@ -322,46 +375,60 @@ JsonObject *ss_import_node(const char *path, guint index, GError **error) {
 
 JsonArray *ss_cidrs_load(const char *path, GError **error) {
     g_autofree char *text = read_bounded(path, error);
-    if (!text) return NULL;
+    if (!text)
+        return NULL;
     g_auto(GStrv) lines = g_strsplit(text, "\n", -1);
     JsonArray *array = json_array_new();
     for (guint i = 0; lines[i]; i++) {
         char *comment = strchr(lines[i], '#');
-        if (comment) *comment = '\0';
+        if (comment)
+            *comment = '\0';
         char *line = g_strstrip(lines[i]);
-        if (*line) json_array_add_string_element(array, line);
+        if (*line)
+            json_array_add_string_element(array, line);
     }
-    if (!cidrs_validate(array, error)) { json_array_unref(array); return NULL; }
+    if (!cidrs_validate(array, error)) {
+        json_array_unref(array);
+        return NULL;
+    }
     return array;
 }
 
 gboolean ss_profile_export(SsProfile *p, const char *path, GError **error) {
     g_autofree char *text = ss_profile_json(p, TRUE);
     int fd = open(path, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
-    if (fd < 0) { g_set_error(error, G_IO_ERROR, g_io_error_from_errno(errno), _("Cannot create configuration file: %s"), g_strerror(errno)); return FALSE; }
+    if (fd < 0) {
+        g_set_error(error, G_IO_ERROR, g_io_error_from_errno(errno),
+                    _("Cannot create configuration file: %s"), g_strerror(errno));
+        return FALSE;
+    }
     gsize written = 0, len = strlen(text);
     while (written < len) {
         ssize_t n = write(fd, text + written, len - written);
-        if (n < 0 && errno == EINTR) continue;
+        if (n < 0 && errno == EINTR)
+            continue;
         if (n <= 0) {
             int saved = errno;
-            close(fd); unlink(path);
-            g_set_error(error, G_IO_ERROR, g_io_error_from_errno(saved), _("Cannot write configuration file"));
+            close(fd);
+            unlink(path);
+            g_set_error(error, G_IO_ERROR, g_io_error_from_errno(saved),
+                        _("Cannot write configuration file"));
             return FALSE;
         }
         written += n;
     }
-    
+
     if (close(fd) != 0) {
         fail(error, _("Cannot close configuration file"));
         return FALSE;
     }
-    
+
     return TRUE;
 }
 
 gboolean ss_connection_update(SsProfile *p, NMConnection *conn, GError **error) {
-    if (!ss_profile_validate(p, error)) return FALSE;
+    if (!ss_profile_validate(p, error))
+        return FALSE;
     NMSettingVpn *vpn = NM_SETTING_VPN(nm_setting_vpn_new());
     g_object_set(vpn, NM_SETTING_VPN_SERVICE_TYPE, SS_SERVICE, NULL);
     g_autofree char *public = ss_profile_json(p, FALSE);
@@ -370,7 +437,6 @@ gboolean ss_connection_update(SsProfile *p, NMConnection *conn, GError **error) 
         const char *key = i == 0 ? "tcp-password" : "udp-password";
         nm_setting_vpn_add_secret(vpn, key, ss_string(ss_node(p, i), "password"));
         nm_setting_set_secret_flags(NM_SETTING(vpn), key, NM_SETTING_SECRET_FLAG_NONE, NULL);
-
     }
     nm_connection_add_setting(conn, NM_SETTING(vpn));
     return TRUE;
@@ -381,58 +447,80 @@ NMConnection *ss_connection_new(SsProfile *p, GError **error) {
     NMSetting *meta = nm_setting_connection_new();
     g_autofree char *uuid = nm_utils_uuid_generate();
     g_object_set(meta, NM_SETTING_CONNECTION_ID, ss_string(p->obj, "name"),
-        NM_SETTING_CONNECTION_UUID, uuid, NM_SETTING_CONNECTION_TYPE, "vpn",
-        NM_SETTING_CONNECTION_AUTOCONNECT, FALSE, NULL);
+                 NM_SETTING_CONNECTION_UUID, uuid, NM_SETTING_CONNECTION_TYPE, "vpn",
+                 NM_SETTING_CONNECTION_AUTOCONNECT, FALSE, NULL);
     nm_connection_add_setting(conn, meta);
-    if (!ss_connection_update(p, conn, error)) { g_object_unref(conn); return NULL; }
+    if (!ss_connection_update(p, conn, error)) {
+        g_object_unref(conn);
+        return NULL;
+    }
     for (guint i = 0; i < 2; i++) {
         NMSetting *ip = i == 0 ? nm_setting_ip4_config_new() : nm_setting_ip6_config_new();
-        g_object_set(ip, NM_SETTING_IP_CONFIG_METHOD, "auto", NM_SETTING_IP_CONFIG_NEVER_DEFAULT, TRUE,
-                     NM_SETTING_IP_CONFIG_DNS_PRIORITY, -5353, NULL);
+        g_object_set(ip, NM_SETTING_IP_CONFIG_METHOD, "auto", NM_SETTING_IP_CONFIG_NEVER_DEFAULT,
+                     TRUE, NM_SETTING_IP_CONFIG_DNS_PRIORITY, -5353, NULL);
         nm_setting_ip_config_add_dns_search(NM_SETTING_IP_CONFIG(ip), "~.");
         nm_connection_add_setting(conn, ip);
     }
-    if (!nm_connection_verify(conn, error)) { g_object_unref(conn); return NULL; }
+    if (!nm_connection_verify(conn, error)) {
+        g_object_unref(conn);
+        return NULL;
+    }
     return conn;
 }
 
 SsProfile *ss_profile_from_connection(NMConnection *conn, gboolean require, GError **error) {
     NMSettingVpn *vpn = nm_connection_get_setting_vpn(conn);
     if (!vpn || g_strcmp0(nm_setting_vpn_get_service_type(vpn), SS_SERVICE)) {
-        fail(error, _("Not a Shadowsocks VPN connection")); return NULL;
+        fail(error, _("Not a Shadowsocks VPN connection"));
+        return NULL;
     }
     const char *text = nm_setting_vpn_get_data_item(vpn, "profile");
     JsonObject *o = text ? parse_object(text, error) : NULL;
-    if (!o) { if (!text) fail(error, _("Missing configuration")); return NULL; }
+    if (!o) {
+        if (!text)
+            fail(error, _("Missing configuration"));
+        return NULL;
+    }
     for (guint i = 0; i < 2; i++) {
         JsonObject *node = object_member(o, i == 0 ? "tcp" : "udp");
         const char *pw = nm_setting_vpn_get_secret(vpn, i == 0 ? "tcp-password" : "udp-password");
-        if (node) json_object_set_string_member(node, "password", pw ? pw : "");
+        if (node)
+            json_object_set_string_member(node, "password", pw ? pw : "");
         if (node) {
             const char *fields[] = {"plugin_opts", "plugin_args", NULL};
             for (guint j = 0; fields[j]; j++) {
                 g_autofree char *key = g_strdup_printf("%s-%s", i == 0 ? "tcp" : "udp", fields[j]);
                 const char *value = nm_setting_vpn_get_secret(vpn, key);
                 /* Prefer configuration data; fall back to legacy secrets. */
-                if (json_object_has_member(node, fields[j]) || !value) continue;
+                if (json_object_has_member(node, fields[j]) || !value)
+                    continue;
                 g_autoptr(JsonParser) parser = json_parser_new();
-                if (!json_parser_load_from_data(parser, value, -1, error)) { json_object_unref(o); return NULL; }
-                json_object_set_member(node, fields[j], json_node_copy(json_parser_get_root(parser)));
+                if (!json_parser_load_from_data(parser, value, -1, error)) {
+                    json_object_unref(o);
+                    return NULL;
+                }
+                json_object_set_member(node, fields[j],
+                                       json_node_copy(json_parser_get_root(parser)));
             }
         }
     }
     /* Editors may load a connection whose agent has not supplied secrets yet. */
-    if (!require) for (guint i = 0; i < 2; i++) {
-        JsonObject *n = object_member(o, i == 0 ? "tcp" : "udp");
-        if (n && !*ss_string(n, "password")) json_object_set_string_member(n, "password", "__missing__");
-    }
+    if (!require)
+        for (guint i = 0; i < 2; i++) {
+            JsonObject *n = object_member(o, i == 0 ? "tcp" : "udp");
+            if (n && !*ss_string(n, "password"))
+                json_object_set_string_member(n, "password", "__missing__");
+        }
     g_autofree char *full = serialize(o);
     json_object_unref(o);
     SsProfile *p = ss_profile_parse(full, error);
-    if (p && !require) for (guint i = 0; i < 2; i++) {
-        const char *pw = nm_setting_vpn_get_secret(vpn, i == 0 ? "tcp-password" : "udp-password");
-        if (!pw) json_object_set_string_member(ss_node(p, i), "password", "");
-    }
+    if (p && !require)
+        for (guint i = 0; i < 2; i++) {
+            const char *pw =
+                nm_setting_vpn_get_secret(vpn, i == 0 ? "tcp-password" : "udp-password");
+            if (!pw)
+                json_object_set_string_member(ss_node(p, i), "password", "");
+        }
     return p;
 }
 

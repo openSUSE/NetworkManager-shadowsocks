@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "ss.h"
 #include <arpa/inet.h>
 #include <string.h>
@@ -36,11 +35,13 @@ GVariant *ss_ip_config(SsProfile *p, guint family) {
     g_variant_builder_init(&domains, G_VARIANT_TYPE("as"));
     g_variant_builder_add(&domains, "s", "~.");
     if (family == 4) {
-        g_variant_builder_add(&ip, "{sv}", "address", g_variant_new_uint32(ip4_number("198.18.0.1")));
+        g_variant_builder_add(&ip, "{sv}", "address",
+                              g_variant_new_uint32(ip4_number("198.18.0.1")));
     } else {
         g_autoptr(GInetAddress) address = g_inet_address_new_from_string("fd53:5353::1");
-        g_variant_builder_add(&ip, "{sv}", "address", g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE,
-            g_inet_address_to_bytes(address), 16, 1));
+        g_variant_builder_add(&ip, "{sv}", "address",
+                              g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE,
+                                                        g_inet_address_to_bytes(address), 16, 1));
     }
     g_variant_builder_add(&ip, "{sv}", "prefix", g_variant_new_uint32(family == 4 ? 30 : 126));
     g_variant_builder_add(&ip, "{sv}", "never-default", g_variant_new_boolean(TRUE));
@@ -48,10 +49,15 @@ GVariant *ss_ip_config(SsProfile *p, guint family) {
     for (guint i = 0; i < json_array_get_length(servers); i++) {
         const char *text = json_array_get_string_element(servers, i);
         g_autoptr(GInetAddress) address = g_inet_address_new_from_string(text);
-        if (g_inet_address_get_family(address) != (family == 4 ? G_SOCKET_FAMILY_IPV4 : G_SOCKET_FAMILY_IPV6)) continue;
-        if (family == 4) g_variant_builder_add(&dns, "u", ip4_number(text));
-        else g_variant_builder_add_value(&dns, g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE,
-            g_inet_address_to_bytes(address), 16, 1));
+        if (g_inet_address_get_family(address) !=
+            (family == 4 ? G_SOCKET_FAMILY_IPV4 : G_SOCKET_FAMILY_IPV6))
+            continue;
+        if (family == 4)
+            g_variant_builder_add(&dns, "u", ip4_number(text));
+        else
+            g_variant_builder_add_value(
+                &dns, g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE,
+                                                g_inet_address_to_bytes(address), 16, 1));
     }
     g_variant_builder_add(&ip, "{sv}", "dns", g_variant_builder_end(&dns));
     g_variant_builder_add(&ip, "{sv}", "domains", g_variant_builder_end(&domains));
@@ -62,9 +68,12 @@ GVariant *ss_general_config(SsProfile *p, GInetAddress *gateway) {
     g_return_val_if_fail(G_IS_INET_ADDRESS(gateway), NULL);
     GVariantBuilder config;
     g_variant_builder_init(&config, G_VARIANT_TYPE_VARDICT);
-    g_variant_builder_add(&config, "{sv}", NM_VPN_PLUGIN_CONFIG_TUNDEV, g_variant_new_string("nmss-tun"));
-    g_variant_builder_add(&config, "{sv}", NM_VPN_PLUGIN_CONFIG_HAS_IP4, g_variant_new_boolean(ss_enabled(p, 4)));
-    g_variant_builder_add(&config, "{sv}", NM_VPN_PLUGIN_CONFIG_HAS_IP6, g_variant_new_boolean(ss_enabled(p, 6)));
+    g_variant_builder_add(&config, "{sv}", NM_VPN_PLUGIN_CONFIG_TUNDEV,
+                          g_variant_new_string("nmss-tun"));
+    g_variant_builder_add(&config, "{sv}", NM_VPN_PLUGIN_CONFIG_HAS_IP4,
+                          g_variant_new_boolean(ss_enabled(p, 4)));
+    g_variant_builder_add(&config, "{sv}", NM_VPN_PLUGIN_CONFIG_HAS_IP6,
+                          g_variant_new_boolean(ss_enabled(p, 6)));
     g_variant_builder_add(&config, "{sv}", NM_VPN_PLUGIN_CONFIG_MTU, g_variant_new_uint32(1400));
     const guint8 *bytes = g_inet_address_to_bytes(gateway);
     GVariant *value;

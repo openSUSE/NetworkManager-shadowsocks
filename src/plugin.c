@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "ss.h"
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -32,36 +31,50 @@ static gboolean trusted_path(const char *path) {
     g_autofree char *part = g_strdup(path);
     while (*part) {
         struct stat st;
-        if (stat(part, &st) || st.st_uid != 0 || (st.st_mode & 0022)) return FALSE;
-        if (!strcmp(part, "/")) break;
+        if (stat(part, &st) || st.st_uid != 0 || (st.st_mode & 0022))
+            return FALSE;
+        if (!strcmp(part, "/"))
+            break;
         char *slash = strrchr(part, '/');
-        if (!slash) return FALSE;
-        if (slash == part) part[1] = '\0'; else *slash = '\0';
+        if (!slash)
+            return FALSE;
+        if (slash == part)
+            part[1] = '\0';
+        else
+            *slash = '\0';
     }
     return TRUE;
 }
 
 char *ss_plugin_resolve(const char *program, GError **error) {
-    const char *known[] = {"obfs-local", "v2ray-plugin", "xray-plugin", "kcptun-client", "shadow-tls", NULL};
+    const char *known[] = {"obfs-local",    "v2ray-plugin", "xray-plugin",
+                           "kcptun-client", "shadow-tls",   NULL};
     g_autofree char *base = g_path_get_basename(program);
     gboolean standard = g_strv_contains(known, base);
     g_autofree char *path = NULL;
     if (g_path_is_absolute(program)) {
-        if (standard || (g_str_has_prefix(program, PLUGIN_DIR) &&
-            !strchr(program + strlen(PLUGIN_DIR), '/') && strcmp(base, ".") && strcmp(base, ".."))) path = g_strdup(program);
+        if (standard ||
+            (g_str_has_prefix(program, PLUGIN_DIR) && !strchr(program + strlen(PLUGIN_DIR), '/') &&
+             strcmp(base, ".") && strcmp(base, "..")))
+            path = g_strdup(program);
     } else {
         const char *dirs[] = {PLUGIN_DIR, "/usr/bin", "/usr/local/bin", NULL};
         for (guint i = 0; dirs[i]; i++) {
-            if (i && !standard) continue;
+            if (i && !standard)
+                continue;
             g_autofree char *candidate = g_build_filename(dirs[i], program, NULL);
-            if (g_file_test(candidate, G_FILE_TEST_IS_EXECUTABLE)) { path = g_steal_pointer(&candidate); break; }
+            if (g_file_test(candidate, G_FILE_TEST_IS_EXECUTABLE)) {
+                path = g_steal_pointer(&candidate);
+                break;
+            }
         }
     }
     g_autofree char *resolved = path ? realpath(path, NULL) : NULL;
     struct stat st;
-    if (!resolved || !trusted_path(path) || !trusted_path(resolved) ||
-        stat(resolved, &st) || !S_ISREG(st.st_mode) || access(resolved, X_OK)) {
-        g_set_error_literal(error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+    if (!resolved || !trusted_path(path) || !trusted_path(resolved) || stat(resolved, &st) ||
+        !S_ISREG(st.st_mode) || access(resolved, X_OK)) {
+        g_set_error_literal(
+            error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
             _("Plugin is missing or untrusted; install a supported system plugin or ask an administrator to register it in /usr/libexec/NetworkManager/shadowsocks/plugins"));
         return NULL;
     }

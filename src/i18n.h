@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #pragma once
 #include "config.h"
 #include <glib/gi18n-lib.h>

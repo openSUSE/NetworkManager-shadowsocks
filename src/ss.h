@@ -18,7 +18,6 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #pragma once
 #include <NetworkManager.h>
 #include <gio/gio.h>
@@ -30,7 +29,9 @@
 #define SS_ERROR G_IO_ERROR
 #define SS_MAX_CONFIG (4 * 1024 * 1024)
 
-typedef struct { JsonObject *obj; } SsProfile;
+typedef struct {
+    JsonObject *obj;
+} SsProfile;
 SsProfile *ss_profile_new(void);
 SsProfile *ss_profile_parse(const char *text, GError **error);
 SsProfile *ss_profile_load(const char *path, GError **error);

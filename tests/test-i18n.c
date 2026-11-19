@@ -18,19 +18,18 @@
  * along with NetworkManager-shadowsocks. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "ss.h"
 #include <locale.h>
 #include <string.h>
 
 int main(int argc, char **argv) {
     g_assert_cmpint(argc, ==, 3);
-    
+
     if (!setlocale(LC_ALL, "")) {
         g_print("Requested locale is not installed; skipping.\n");
         return 77;
     }
-    
+
     gboolean translated = !strcmp(argv[2], "translated");
     g_autofree char *host_domain = g_strdup(textdomain(NULL));
     ss_i18n_init();
@@ -40,15 +39,21 @@ int main(int argc, char **argv) {
     bindtextdomain(GETTEXT_PACKAGE, argv[1]);
     const char *server = _("Server");
     g_assert_true(g_utf8_validate(server, -1, NULL));
-    if (translated) g_assert_cmpstr(server, !=, "Server");
-    else g_assert_cmpstr(server, ==, "Server");
+    if (translated)
+        g_assert_cmpstr(server, !=, "Server");
+    else
+        g_assert_cmpstr(server, ==, "Server");
     g_autoptr(GError) error = NULL;
     g_autoptr(SsProfile) profile = ss_profile_parse("[]", &error);
-    g_assert_null(profile); g_assert_nonnull(error);
+    g_assert_null(profile);
+    g_assert_nonnull(error);
     g_assert_cmpstr(error->message, ==, _("Configuration must be a JSON object"));
-    if (translated) g_assert_cmpstr(error->message, !=, "Configuration must be a JSON object");
-    g_autofree char *counts = g_strdup_printf(_("Regional prefixes: IPv4 %u / IPv6 %u - Import custom list..."), 8798, 2048);
-    g_assert_nonnull(strstr(counts, "8798")); g_assert_nonnull(strstr(counts, "2048"));
+    if (translated)
+        g_assert_cmpstr(error->message, !=, "Configuration must be a JSON object");
+    g_autofree char *counts = g_strdup_printf(
+        _("Regional prefixes: IPv4 %u / IPv6 %u - Import custom list..."), 8798, 2048);
+    g_assert_nonnull(strstr(counts, "8798"));
+    g_assert_nonnull(strstr(counts, "2048"));
     g_print("%s\n%s\n", server, error->message);
     return 0;
 }
