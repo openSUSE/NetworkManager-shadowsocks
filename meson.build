@@ -1,4 +1,4 @@
-project('NetworkManager-shadowsocks', 'c', version: '0.1.0',
+project('NetworkManager-shadowsocks', 'c', version: '1.1.0',
   meson_version: '>=0.61', default_options: ['c_std=gnu11', 'warning_level=2'])
 libnm = dependency('libnm', version: '>=1.20')
 gio = dependency('gio-unix-2.0', version: '>=2.66')
@@ -93,7 +93,7 @@ configure_file(input: 'data/nm-shadowsocks-service.name.in', output: 'nm-shadows
   configuration: vpnconf, install: true, install_dir: vpn_dir)
 install_data('data/org.freedesktop.NetworkManager.shadowsocks.conf',
   install_dir: get_option('datadir') / 'dbus-1/system.d')
-install_data('examples/profile.json', 'examples/regional-example.cidr', install_dir: get_option('datadir') / 'doc/NetworkManager-shadowsocks/examples')
+install_data('examples/profile.json', 'examples/regional-example.cidr', install_dir: get_option('datadir') / 'doc/packages/NetworkManager-shadowsocks/examples')
 install_data('data/china/china.cidr', 'data/china/china-ipv4.cidr', 'data/china/china-ipv6.cidr',
   'data/china/china.json', 'data/china/README.md', install_dir: get_option('datadir') / 'NetworkManager-shadowsocks/china')
 
